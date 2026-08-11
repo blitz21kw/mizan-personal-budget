@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+:root {
+  --canvas: #f4f7f5;
+  --surface: #ffffff;
+  --ink: #17261f;
+  --muted: #73807a;
+  --line: #e7ece8;
+  --green: #2d9b73;
+  --green-soft: #e5f4ec;
+  --navy: #132b23;
+  --orange: #ed9a4d;
+  --red: #db645d;
+  --shadow-soft: 0 18px 55px rgba(26, 57, 43, 0.07);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--canvas);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 5% 0%, rgba(202, 231, 216, 0.34), transparent 28rem),
+    var(--canvas);
+  color: var(--ink);
+  font-family: Arial, "Noto Sans Arabic", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+::selection {
+  background: #bfe8d3;
+  color: var(--ink);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
+
+input[type="date"],
+input[type="month"] {
+  color-scheme: light;
+}
+
+.number-ltr {
+  direction: ltr;
+  unicode-bidi: plaintext;
+}
+
+.surface-card {
+  border: 1px solid rgba(224, 232, 226, 0.92);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-soft);
+}
+
+.soft-grid {
+  background-image: linear-gradient(rgba(54, 104, 78, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(54, 104, 78, 0.045) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.safe-bottom {
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+.safe-bottom-space {
+  height: calc(5.9rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 1024px) {
+  .safe-bottom-space {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
