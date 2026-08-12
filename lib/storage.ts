@@ -24,6 +24,7 @@ export function createMonth(monthKey = getMonthKey(new Date()), template?: Month
     investment: numberOr(template?.investment, 0),
     emergencyFund: numberOr(template?.emergencyFund, 0),
     outings: numberOr(template?.outings, 0),
+    surplusTransferred: 0,
   };
 }
 
@@ -89,6 +90,7 @@ function normalizeMonth(monthKey: string, value: unknown, fallback?: MonthData):
     investment: numberOr(candidate.investment, fallback?.investment ?? 0),
     emergencyFund: numberOr(candidate.emergencyFund, fallback?.emergencyFund ?? 0),
     outings: numberOr(candidate.outings, fallback?.outings ?? 0),
+    surplusTransferred: Math.max(0, numberOr(candidate.surplusTransferred, fallback?.surplusTransferred ?? 0)),
   };
 }
 

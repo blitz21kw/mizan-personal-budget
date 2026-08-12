@@ -62,6 +62,23 @@ export function getCategorySpent(expenses: { categoryId: string; amount: number 
   );
 }
 
+export function getUnusedBudgetSurplus(month: {
+  categories: { budget: number; spent: number }[];
+  surplusTransferred?: number;
+}) {
+  const totalUnused = month.categories.reduce(
+    (total, category) => total + Math.max(0, category.budget - category.spent),
+    0,
+  );
+  const transferred = Math.max(0, month.surplusTransferred ?? 0);
+
+  return {
+    totalUnused,
+    transferred,
+    available: Math.max(0, totalUnused - transferred),
+  };
+}
+
 export function getMonthTotals(month: {
   salary: number;
   deductions: number;

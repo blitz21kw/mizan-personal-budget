@@ -3,6 +3,7 @@ import {
   ArrowUpLeft,
   Banknote,
   CalendarDays,
+  Check,
   CircleDollarSign,
   Coins,
   CreditCard,
@@ -12,9 +13,10 @@ import {
   Sparkles,
   TrendingUp,
   WalletCards,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { formatMoney, formatMonthLabel, getMonthTotals, normalizeNumericInput } from "@/lib/format";
+import { formatMoney, formatMonthLabel, getMonthTotals, getUnusedBudgetSurplus, normalizeNumericInput } from "@/lib/format";
 import type { Category, MonthData } from "@/lib/types";
 
 type ReserveField = "investment" | "emergencyFund" | "outings";
@@ -26,6 +28,7 @@ type DashboardViewProps = {
   onUpdateCategoryBudget: (categoryId: string, budget: number) => void;
   onUpdateCategorySpent: (categoryId: string, spent: number) => void;
   onUpdateReserve: (field: ReserveField, amount: number) => void;
+  onTransferSurplus: (investmentPercent: number, emergencyPercent: number) => void;
   onAddExpense: () => void;
   onOpenSettings: () => void;
   onOpenTransactions: () => void;
@@ -39,6 +42,7 @@ export default function DashboardView({
   onUpdateCategoryBudget,
   onUpdateCategorySpent,
   onUpdateReserve,
+  onTransferSurplus,
   onAddExpense,
   onOpenSettings,
   onOpenTransactions,
@@ -48,6 +52,36 @@ export default function DashboardView({
   const spentRatio = totals.netSalary > 0 ? totals.totalSpent / totals.netSalary : 0;
   const fixedRatio = totals.netSalary > 0 ? totals.fixedAllocations / totals.netSalary : 0;
   const monthLabel = formatMonthLabel(month.monthKey);
+  const surplus = getUnusedBudgetSurplus(month);
+  const [isSurplusDialogOpen, setIsSurplusDialogOpen] = useState(false);
+  const [investmentPercent, setInvestmentPercent] = useState("50");
+  const [emergencyPercent, setEmergencyPercent] = useState("50");
+  const [surplusError, setSurplusError] = useState("");
+  const investmentPercentValue = percentageValue(investmentPercent);
+  const emergencyPercentValue = percentageValue(emergencyPercent);
+  const totalPercent = investmentPercentValue + emergencyPercentValue;
+  const leftoverPercent = Math.max(0, 100 - totalPercent);
+  const investmentAmount = Math.round(surplus.available * investmentPercentValue / 100 * 1000) / 1000;
+  const emergencyAmount = Math.round(surplus.available * emergencyPercentValue / 100 * 1000) / 1000;
+  const leftoverAmount = Math.max(0, Math.round((surplus.available - investmentAmount - emergencyAmount) * 1000) / 1000);
+
+  function openSurplusDialog() {
+    setSurplusError("");
+    setIsSurplusDialogOpen(true);
+  }
+
+  function submitSurplusTransfer() {
+    if (totalPercent > 100) {
+      setSurplusError("مجموع النسب لا يمكن أن يتجاوز ١٠٠٪.");
+      return;
+    }
+    if (totalPercent <= 0) {
+      setSurplusError("حدد نسبة واحدة على الأقل للتحويل.");
+      return;
+    }
+    onTransferSurplus(investmentPercentValue, emergencyPercentValue);
+    setIsSurplusDialogOpen(false);
+  }
 
   return (
     <div className="dashboard-view space-y-6 pb-2">
@@ -142,6 +176,27 @@ export default function DashboardView({
         </div>
       </section>
 
+      <section className="surface-card overflow-hidden rounded-[28px] border-[#cfe5d6] bg-[linear-gradient(135deg,#f7fcf8,#eef8f1)] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#dff3e7] text-[#2d9b73]"><Sparkles className="size-[19px]" /></span>
+            <div>
+              <p className="text-xs font-extrabold tracking-[0.12em] text-[#6f9880]">الفائض غير المستخدم</p>
+              <h2 className="mt-1 text-lg font-black tracking-[-0.04em] text-[#19382c]">حوّل المتبقي إلى أمان أكثر</h2>
+              <p className="mt-1.5 text-xs font-semibold leading-6 text-[#718c7b]">المبلغ الذي ظل داخل ميزانياتك ويمكن توزيعه بين الاستثمار والطوارئ.</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/75 px-4 py-3 sm:min-w-56 sm:flex-col sm:items-end sm:bg-transparent sm:p-0">
+            <div className="text-right"><p className="text-[10px] font-bold text-[#87a192]">المتاح للتحويل</p><p className="number-ltr mt-1 text-xl font-black text-[#237951]">{formatMoney(surplus.available)}</p></div>
+            <button type="button" onClick={openSurplusDialog} disabled={surplus.available <= 0} className="flex min-h-11 items-center gap-2 rounded-xl bg-[#247c58] px-4 text-xs font-black text-white shadow-[0_8px_18px_rgba(36,124,88,0.18)] transition hover:bg-[#1d684a] disabled:bg-[#b6c9bc] disabled:shadow-none"><Sparkles className="size-3.5" /> {surplus.available > 0 ? "تحويل الفائض" : "لا يوجد فائض"}</button>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-bold text-[#88a092]">
+          <span>إجمالي المتبقي من الميزانيات: <b className="number-ltr text-[#557665]">{formatMoney(surplus.totalUnused)}</b></span>
+          {surplus.transferred > 0 && <span>تم تحويله سابقاً: <b className="number-ltr text-[#557665]">{formatMoney(surplus.transferred)}</b></span>}
+        </div>
+      </section>
+
       <section>
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
@@ -192,6 +247,39 @@ export default function DashboardView({
 
       <p className="text-center text-xs font-semibold text-[#a1aca5]">{monthLabel} · آخر تحديث محفوظ على جهازك</p>
       <button type="button" onClick={onOpenHistory} className="sr-only">فتح السجل الشهري</button>
+
+      {isSurplusDialogOpen && (
+        <div className="fixed inset-0 z-[55] flex items-end justify-center bg-[#10251d]/50 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-label="تحويل فائض الميزانية">
+          <div className="w-full max-w-lg rounded-t-[30px] bg-[#f5f8f6] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:rounded-[30px] sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div><p className="text-xs font-extrabold tracking-[0.14em] text-[#2d9b73]">تحويل الفائض</p><h2 className="mt-1 text-xl font-black tracking-[-0.04em] text-[#19382c]">وين تبي تحط المبلغ؟</h2><p className="mt-1.5 text-xs font-semibold leading-6 text-[#84948a]">اختر النسبة لكل جهة. أي نسبة متبقية تبقى خارج التحويل.</p></div>
+              <button type="button" onClick={() => setIsSurplusDialogOpen(false)} className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#e1ebe3] bg-white text-[#83958a]" aria-label="إغلاق"><X className="size-4" /></button>
+            </div>
+
+            <div className="mt-5 rounded-[22px] bg-[#19382c] p-4 text-white">
+              <p className="text-xs font-bold text-[#b9d7c4]">المبلغ المتاح حالياً</p>
+              <p className="number-ltr mt-1 text-3xl font-black tracking-[-0.06em] text-[#effff5]">{formatMoney(surplus.available)}</p>
+              <p className="mt-1 text-[11px] font-semibold text-[#a5c7b2]">سيتم احتساب المبلغ بدقة قبل التأكيد.</p>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <button type="button" onClick={() => { setInvestmentPercent("100"); setEmergencyPercent("0"); setSurplusError(""); }} className="min-h-10 rounded-xl border border-[#dfeae2] bg-white px-2 text-[11px] font-black text-[#557665] transition hover:border-[#a9d5b8]">كله استثمار</button>
+              <button type="button" onClick={() => { setInvestmentPercent("50"); setEmergencyPercent("50"); setSurplusError(""); }} className="min-h-10 rounded-xl border border-[#dfeae2] bg-white px-2 text-[11px] font-black text-[#557665] transition hover:border-[#a9d5b8]">نصف ونصف</button>
+              <button type="button" onClick={() => { setInvestmentPercent("0"); setEmergencyPercent("100"); setSurplusError(""); }} className="min-h-10 rounded-xl border border-[#dfeae2] bg-white px-2 text-[11px] font-black text-[#557665] transition hover:border-[#a9d5b8]">كله طوارئ</button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <SurplusDestination label="استثمار" helper="نسبة التحويل للاستثمار" value={investmentPercent} onChange={(value) => { setInvestmentPercent(value); setSurplusError(""); }} amount={investmentAmount} tone="mint" icon={TrendingUp} />
+              <SurplusDestination label="صندوق الطوارئ" helper="نسبة التحويل للطوارئ" value={emergencyPercent} onChange={(value) => { setEmergencyPercent(value); setSurplusError(""); }} amount={emergencyAmount} tone="peach" icon={ShieldCheck} />
+            </div>
+
+            <div className={`mt-4 flex items-center justify-between rounded-2xl px-4 py-3 ${totalPercent > 100 ? "bg-[#fff0ee] text-[#c35d57]" : "bg-[#eef7f0] text-[#527561]"}`}><span className="text-xs font-bold">سيبقى بعد التحويل</span><span className="number-ltr text-sm font-black">{formatMoney(leftoverAmount)} <span className="text-[10px] font-bold">({leftoverPercent}٪)</span></span></div>
+            {surplusError && <p role="alert" className="mt-3 rounded-2xl bg-[#fff0ee] px-4 py-3 text-xs font-bold text-[#c35d57]">{surplusError}</p>}
+
+            <button type="button" onClick={submitSurplusTransfer} disabled={totalPercent <= 0 || totalPercent > 100 || surplus.available <= 0} className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#2d9b73] text-sm font-black text-white shadow-[0_10px_22px_rgba(45,155,115,0.2)] transition hover:bg-[#247c58] disabled:bg-[#b6c9bc] disabled:shadow-none"><Check className="size-4" /> تأكيد التحويل</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -379,5 +467,21 @@ function InlineMoneyInput({ value, label, onCommit, compact = false }: { value: 
       onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}
       className={`money-edit-input number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[3.8rem] text-[11px]" : "w-[4.75rem] text-sm"}`}
     />
+  );
+}
+
+function percentageValue(value: string) {
+  return Math.min(100, Math.max(0, Number.parseFloat(normalizeNumericInput(value)) || 0));
+}
+
+function SurplusDestination({ label, helper, value, onChange, amount, tone, icon: Icon }: { label: string; helper: string; value: string; onChange: (value: string) => void; amount: number; tone: "mint" | "peach"; icon: typeof TrendingUp }) {
+  const toneClasses = tone === "mint" ? "bg-[#e8f7ee] text-[#2d9b73]" : "bg-[#fff1e5] text-[#db8642]";
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-[#e3ece5] bg-white px-3 py-3">
+      <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${toneClasses}`}><Icon className="size-[18px]" /></span>
+      <div className="min-w-0 flex-1"><p className="text-sm font-black text-[#314c3d]">{label}</p><p className="mt-0.5 truncate text-[10px] font-semibold text-[#93a198]">{helper}</p></div>
+      <div className="relative w-20 shrink-0"><input aria-label={`${label} بالنسبة`} type="text" inputMode="decimal" value={value} onChange={(event) => onChange(normalizeNumericInput(event.target.value))} className="number-ltr min-h-11 w-full rounded-xl border border-[#e3ece5] bg-[#f8fbf8] px-2 pl-7 text-left text-sm font-black text-[#315c45] outline-none focus:border-[#96d3ab] focus:bg-white focus:ring-4 focus:ring-[#d8f2e0]" /><span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs font-black text-[#8da196]">٪</span></div>
+      <span className="number-ltr w-24 shrink-0 text-left text-xs font-black text-[#557665]">{formatMoney(amount)}</span>
+    </div>
   );
 }

@@ -34,6 +34,7 @@ export type MonthData = {
   investment: number;
   emergencyFund: number;
   outings: number;
+  surplusTransferred: number;
 };
 
 export type BudgetState = {
