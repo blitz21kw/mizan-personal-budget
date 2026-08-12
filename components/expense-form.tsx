@@ -1,6 +1,6 @@
 import { Check, ChevronDown, FileText, Hash, Tag, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { formatMoney, getDateInputValue } from "@/lib/format";
+import { formatMoney, getDateInputValue, normalizeNumericInput } from "@/lib/format";
 import type { Category, Expense, ExpenseDraft } from "@/lib/types";
 
 type ExpenseFormProps = {
@@ -62,13 +62,11 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
           <div className="mt-3 flex items-baseline gap-2 border-b border-[#dfe8e1] pb-3 focus-within:border-[#2d9b73]">
             <input
               autoFocus={!isEditing}
-              type="number"
-              min="0"
-              step="0.001"
+              type="text"
               inputMode="decimal"
               placeholder="0"
               value={amount}
-              onChange={(event) => { setAmount(event.target.value); setError(""); }}
+              onChange={(event) => { setAmount(normalizeNumericInput(event.target.value)); setError(""); }}
               className="number-ltr w-full min-w-0 bg-transparent text-5xl font-black tracking-[-0.07em] text-[#19382c] outline-none placeholder:text-[#d9e1dc] sm:text-6xl"
               aria-label="مبلغ المصروف"
             />

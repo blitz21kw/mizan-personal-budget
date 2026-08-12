@@ -9,6 +9,15 @@ export function formatMoney(value: number, currency = "د.ك") {
   return `${formatted} ${currency}`;
 }
 
+export function normalizeNumericInput(value: string) {
+  return value
+    .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 0x06f0))
+    .replace(/٫/g, ".")
+    .replace(/٬/g, "")
+    .replace(/,/g, "");
+}
+
 export function formatNumber(value: number) {
   const safeValue = Math.abs(value) < 0.0005 ? 0 : value;
   return new Intl.NumberFormat("en-US", {

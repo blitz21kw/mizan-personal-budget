@@ -1,7 +1,7 @@
 import { Check, ChevronLeft, CirclePlus, Coins, PenLine, Plus, ShieldCheck, Trash2, TrendingUp, WalletCards } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CATEGORY_COLORS } from "@/lib/constants";
-import { formatMoney, getMonthTotals } from "@/lib/format";
+import { formatMoney, getMonthTotals, normalizeNumericInput } from "@/lib/format";
 import type { Category, MonthData, MonthSettings } from "@/lib/types";
 
 type SettingsViewProps = {
@@ -31,7 +31,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
     setMessage("");
   }, [month]);
 
-  const numeric = (value: string) => Math.max(0, Number.parseFloat(value) || 0);
+  const numeric = (value: string) => Math.max(0, Number.parseFloat(normalizeNumericInput(value)) || 0);
   const totals = useMemo(() => getMonthTotals({ salary: numeric(salary), deductions: numeric(deductions), categories, expenses: month.expenses, investment: numeric(investment), emergencyFund: numeric(emergencyFund), outings: numeric(outings) }), [categories, deductions, emergencyFund, investment, month.expenses, outings, salary]);
 
   function updateCategory(id: string, value: string) {
@@ -131,7 +131,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
               <span className="flex size-9 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${category.color}1A` }}><span className="size-2.5 rounded-full" style={{ backgroundColor: category.color }} /></span>
               <span className="min-w-0 flex-1 truncate text-sm font-black text-[#3a5143]">{category.name}</span>
               <div className="relative w-28 shrink-0 sm:w-36">
-                <input aria-label={`ميزانية ${category.name}`} value={category.budget} onChange={(event) => updateCategory(category.id, event.target.value)} type="number" min="0" step="0.001" inputMode="decimal" className="number-ltr min-h-11 w-full rounded-xl border border-[#e5ece7] bg-[#fbfcfb] px-3 pl-10 text-left text-sm font-black text-[#334c3d] outline-none transition focus:border-[#96d3ab] focus:bg-white focus:ring-4 focus:ring-[#d8f2e0]" />
+                <input aria-label={`ميزانية ${category.name}`} value={category.budget} onChange={(event) => updateCategory(category.id, normalizeNumericInput(event.target.value))} type="text" inputMode="decimal" className="number-ltr min-h-11 w-full rounded-xl border border-[#e5ece7] bg-[#fbfcfb] px-3 pl-10 text-left text-sm font-black text-[#334c3d] outline-none transition focus:border-[#96d3ab] focus:bg-white focus:ring-4 focus:ring-[#d8f2e0]" />
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#9aa59e]">د.ك</span>
               </div>
               {!category.isDefault && <button type="button" onClick={() => removeCategory(category)} className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[#c87972] transition hover:bg-[#fff0ee]" aria-label={`حذف ${category.name}`}><Trash2 className="size-4" /></button>}
@@ -145,7 +145,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
           <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_150px_auto]">
             <input value={newCategoryName} onChange={(event) => setNewCategoryName(event.target.value)} type="text" placeholder="اسم التصنيف" className="min-h-11 rounded-xl border border-[#deebe1] bg-white px-3 text-sm font-bold text-[#3e5548] outline-none placeholder:text-[#aebbb2] focus:border-[#96d3ab] focus:ring-4 focus:ring-[#d8f2e0]" />
             <div className="relative">
-              <input value={newCategoryBudget} onChange={(event) => setNewCategoryBudget(event.target.value)} type="number" min="0" step="0.001" placeholder="الميزانية" className="number-ltr min-h-11 w-full rounded-xl border border-[#deebe1] bg-white px-3 pl-10 text-left text-sm font-bold text-[#3e5548] outline-none placeholder:text-[#aebbb2] focus:border-[#96d3ab] focus:ring-4 focus:ring-[#d8f2e0]" />
+              <input value={newCategoryBudget} onChange={(event) => setNewCategoryBudget(normalizeNumericInput(event.target.value))} type="text" inputMode="decimal" placeholder="الميزانية" className="number-ltr min-h-11 w-full rounded-xl border border-[#deebe1] bg-white px-3 pl-10 text-left text-sm font-bold text-[#3e5548] outline-none placeholder:text-[#aebbb2] focus:border-[#96d3ab] focus:ring-4 focus:ring-[#d8f2e0]" />
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#9aa59e]">د.ك</span>
             </div>
             <button type="button" onClick={addCategory} className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#19382c] px-4 text-xs font-black text-white transition hover:bg-[#285542]"><Plus className="size-4" /> إضافة</button>
@@ -172,7 +172,7 @@ function MoneyInput({ label, value, onChange, icon: Icon }: { label: string; val
     <label className="block">
       <span className="flex items-center gap-2 text-xs font-extrabold text-[#829087]"><Icon className="size-3.5 text-[#2d9b73]" /> {label}</span>
       <div className="relative mt-2">
-        <input value={value} onChange={(event) => onChange(event.target.value)} type="number" min="0" step="0.001" inputMode="decimal" className="number-ltr min-h-13 w-full rounded-2xl border border-[#e3ebe5] bg-[#fbfcfb] px-4 pl-12 text-left text-lg font-black text-[#334c3d] outline-none transition focus:border-[#96d3ab] focus:bg-white focus:ring-4 focus:ring-[#d8f2e0]" />
+        <input value={value} onChange={(event) => onChange(normalizeNumericInput(event.target.value))} type="text" inputMode="decimal" className="number-ltr min-h-13 w-full rounded-2xl border border-[#e3ebe5] bg-[#fbfcfb] px-4 pl-12 text-left text-lg font-black text-[#334c3d] outline-none transition focus:border-[#96d3ab] focus:bg-white focus:ring-4 focus:ring-[#d8f2e0]" />
         <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-[#a0aba4]">د.ك</span>
       </div>
     </label>
