@@ -72,14 +72,14 @@ export function DesktopSidebar({ activeView, onChange }: NavigationProps) {
 
 export function MobileBottomNav({ activeView, onChange }: NavigationProps) {
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-[#e2e9e4] bg-white/95 px-3 pt-2 shadow-[0_-12px_35px_rgba(28,60,44,0.08)] backdrop-blur-xl lg:hidden">
+    <nav className="mobile-bottom-nav safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-[#e2e9e4] bg-white/95 px-3 pt-2 shadow-[0_-12px_35px_rgba(28,60,44,0.08)] backdrop-blur-xl lg:hidden">
       <div className="mx-auto grid max-w-xl grid-cols-5 items-end gap-1">
         <MobileNavButton item={navItems[0]} activeView={activeView} onChange={onChange} />
         <MobileNavButton item={navItems[1]} activeView={activeView} onChange={onChange} />
         <button
           type="button"
           onClick={() => onChange("add")}
-          className="-mt-7 flex flex-col items-center gap-1 text-[10px] font-extrabold text-[#2d9b73]"
+          className="mobile-nav-cta -mt-7 flex flex-col items-center gap-1 text-[10px] font-extrabold text-[#2d9b73]"
           aria-label="صرف جديد"
         >
           <span className={`flex size-[54px] items-center justify-center rounded-[20px] border-[5px] border-[#f4f7f5] bg-[#2d9b73] text-white shadow-[0_10px_22px_rgba(45,155,115,0.32)] transition ${activeView === "add" ? "scale-105" : "hover:-translate-y-0.5"}`}>
@@ -101,7 +101,7 @@ function MobileNavButton({ item, activeView, onChange }: NavigationProps & { ite
     <button
       type="button"
       onClick={() => onChange(item.id)}
-      className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-bold transition ${active ? "text-[#2d9b73]" : "text-[#98a29c]"}`}
+      className={`mobile-nav-button flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-bold transition ${active ? "text-[#2d9b73]" : "text-[#98a29c]"}`}
       aria-current={active ? "page" : undefined}
     >
       <Icon className="size-[19px]" strokeWidth={active ? 2.5 : 2} />

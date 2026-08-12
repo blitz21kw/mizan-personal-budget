@@ -84,7 +84,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
   }
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="settings-view space-y-6 pb-2">
       <header>
         <p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">تخصيص الميزانية</p>
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -96,7 +96,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
         </div>
       </header>
 
-      <section className="surface-card rounded-[28px] p-5 sm:p-6">
+      <section className="settings-card surface-card rounded-[28px] p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <span className="flex size-10 items-center justify-center rounded-2xl bg-[#e8f7ee] text-[#2d9b73]"><WalletCards className="size-[18px]" /></span>
           <div><h2 className="text-lg font-black text-[#19382c]">الراتب</h2><p className="mt-1 text-xs font-semibold text-[#8d9991]">الأرقام الأساسية لشهر {month.monthKey}</p></div>
@@ -115,7 +115,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
         </div>
       </section>
 
-      <section className="surface-card rounded-[28px] p-5 sm:p-6">
+      <section className="settings-card surface-card rounded-[28px] p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <span className="flex size-10 items-center justify-center rounded-2xl bg-[#f1ebfb] text-[#9d6bc3]"><TrendingUp className="size-[18px]" /></span>
           <div><h2 className="text-lg font-black text-[#19382c]">تخصيصات إضافية</h2><p className="mt-1 text-xs font-semibold text-[#8d9991]">مبالغ تحجزها قبل الصرف اليومي.</p></div>
@@ -127,7 +127,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
         </div>
       </section>
 
-      <section className="surface-card rounded-[28px] p-5 sm:p-6">
+      <section className="settings-card surface-card rounded-[28px] p-5 sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
             <span className="flex size-10 items-center justify-center rounded-2xl bg-[#fff1e2] text-[#dd8a37]"><WalletCards className="size-[18px]" /></span>

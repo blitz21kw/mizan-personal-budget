@@ -30,7 +30,7 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
   if (!month || !totals) return null;
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="history-view space-y-6 pb-2">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">نظرة عبر الزمن</p>
@@ -51,7 +51,7 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
         ))}
       </div>
 
-      <section className="relative overflow-hidden rounded-[30px] bg-[#19382c] p-5 text-white shadow-[0_22px_50px_rgba(25,56,44,0.16)] sm:p-7">
+      <section className="history-summary relative overflow-hidden rounded-[30px] bg-[#19382c] p-5 text-white shadow-[0_22px_50px_rgba(25,56,44,0.16)] sm:p-7">
         <div className="pointer-events-none absolute -left-16 -top-20 size-64 rounded-full bg-[#70d59c]/15 blur-3xl" />
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div><p className="text-xs font-bold text-[#b7d8c4]">ملخص {formatMonthLabel(activeMonthKey)}</p><p className="number-ltr mt-3 text-4xl font-black tracking-[-0.06em] text-[#effff4]">{formatMoney(totals.remaining)}</p><p className="mt-2 text-xs font-semibold text-[#a8c7b5]">متبقٍ بعد المصروفات والتخصيصات</p></div>
@@ -72,7 +72,7 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
         <HistoryStat label="طلعات ومطاعم" value={month.outings} icon={CircleDollarSign} />
       </section>
 
-      <section className="surface-card rounded-[28px] p-5 sm:p-6">
+      <section className="history-detail-card surface-card rounded-[28px] p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-extrabold tracking-[0.12em] text-[#9aa59f]">تفصيل الإنفاق</p><h2 className="mt-1.5 text-xl font-black tracking-[-0.04em] text-[#19382c]">إجمالي التصنيفات</h2></div><ShieldCheck className="size-5 text-[#77b98e]" /></div>
         <div className="mt-5 divide-y divide-[#edf1ed]">
           {!categoryRows.length && <p className="py-8 text-center text-sm font-bold text-[#8b9890]">لا توجد ميزانيات في هذا الشهر.</p>}

@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #f4f7f5;
+  --canvas: #f5f8f6;
   --surface: #ffffff;
-  --ink: #17261f;
-  --muted: #73807a;
-  --line: #e7ece8;
-  --green: #2d9b73;
-  --green-soft: #e5f4ec;
-  --navy: #132b23;
+  --ink: #16342a;
+  --muted: #74827a;
+  --line: #e4ece6;
+  --green: #278f68;
+  --green-strong: #1c7353;
+  --green-soft: #e7f5ed;
+  --navy: #132e25;
   --orange: #ed9a4d;
   --red: #db645d;
-  --shadow-soft: 0 18px 55px rgba(26, 57, 43, 0.07);
+  --shadow-soft: 0 14px 42px rgba(31, 75, 53, 0.06);
+  --shadow-card: 0 8px 28px rgba(31, 75, 53, 0.055);
+  --shadow-float: 0 16px 34px rgba(31, 104, 73, 0.2);
 }
 
 * {
@@ -22,16 +25,19 @@ html {
   min-width: 320px;
   background: var(--canvas);
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at 5% 0%, rgba(202, 231, 216, 0.34), transparent 28rem),
+    radial-gradient(circle at 7% -4%, rgba(202, 231, 216, 0.36), transparent 30rem),
+    radial-gradient(circle at 96% 36%, rgba(234, 225, 198, 0.14), transparent 25rem),
     var(--canvas);
   color: var(--ink);
-  font-family: Arial, "Noto Sans Arabic", "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Arabic", "Noto Sans Arabic", "Geeza Pro", "Segoe UI", sans-serif;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -45,6 +51,8 @@ textarea {
 
 button {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 button:disabled {
@@ -55,6 +63,21 @@ button:disabled {
 ::selection {
   background: #bfe8d3;
   color: var(--ink);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(39, 143, 104, 0.26);
+  outline-offset: 2px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #a6b3aa;
+  opacity: 1;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -78,9 +101,139 @@ input[type="month"] {
 }
 
 .surface-card {
-  border: 1px solid rgba(224, 232, 226, 0.92);
-  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(224, 233, 226, 0.94);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-card);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.surface-card:hover {
+  border-color: rgba(185, 214, 195, 0.9);
   box-shadow: var(--shadow-soft);
+}
+
+.app-main-shell {
+  padding-inline: clamp(1rem, 3vw, 2.75rem);
+  padding-block: 1.25rem 1rem;
+}
+
+.app-content {
+  width: 100%;
+}
+
+.app-topbar {
+  min-height: 2.75rem;
+}
+
+.dashboard-view,
+.expense-page,
+.settings-view,
+.history-view,
+.transactions-view {
+  animation: page-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dashboard-header {
+  align-items: flex-start;
+}
+
+.month-control {
+  min-width: 11.5rem;
+  border-color: rgba(216, 229, 219, 0.96);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 7px 20px rgba(30, 77, 54, 0.045);
+}
+
+.dashboard-hero {
+  background:
+    radial-gradient(circle at 9% 0%, rgba(113, 216, 156, 0.18), transparent 17rem),
+    linear-gradient(135deg, #173a2c 0%, #123126 100%);
+  box-shadow: 0 22px 56px rgba(21, 69, 48, 0.2);
+}
+
+.dashboard-hero .hero-action {
+  box-shadow: var(--shadow-float);
+}
+
+.dashboard-hero .hero-metrics {
+  border-color: rgba(222, 255, 233, 0.13);
+}
+
+.dashboard-stat-grid > .surface-card {
+  min-height: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.plan-card,
+.savings-card,
+.settings-card,
+.expense-card,
+.history-detail-card,
+.transactions-filter-card {
+  box-shadow: var(--shadow-card);
+}
+
+.budget-category-card {
+  min-height: 10.75rem;
+}
+
+.budget-category-card:hover {
+  transform: translateY(-2px);
+}
+
+.reserve-card {
+  min-height: 4.75rem;
+}
+
+.money-edit-input {
+  min-height: 2rem;
+  line-height: 1.2;
+  -webkit-appearance: none;
+}
+
+.expense-amount-card {
+  box-shadow: var(--shadow-soft);
+}
+
+.expense-amount-input {
+  caret-color: var(--green);
+}
+
+.expense-category-button {
+  min-height: 3.25rem;
+}
+
+.expense-actions {
+  z-index: 15;
+}
+
+.history-summary {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(117, 218, 159, 0.16), transparent 16rem),
+    linear-gradient(135deg, #183b2e, #123126);
+}
+
+.mobile-bottom-nav {
+  border-color: rgba(222, 233, 225, 0.96);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 -14px 34px rgba(29, 70, 50, 0.09);
+}
+
+.mobile-nav-cta {
+  filter: drop-shadow(0 8px 12px rgba(39, 143, 104, 0.18));
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .soft-grid {
@@ -112,6 +265,107 @@ input[type="month"] {
   }
 }
 
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .app-main-shell {
+    padding-inline: 1rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+
+  .app-topbar {
+    min-height: 2.5rem;
+  }
+
+  .dashboard-view,
+  .expense-page,
+  .settings-view,
+  .history-view,
+  .transactions-view {
+    padding-bottom: 0.25rem;
+  }
+
+  .dashboard-header {
+    gap: 1rem;
+  }
+
+  .month-control {
+    width: 100%;
+    min-height: 3.25rem;
+  }
+
+  .dashboard-hero {
+    border-radius: 1.625rem;
+    padding: 1.25rem;
+  }
+
+  .dashboard-hero .hero-action {
+    width: 100%;
+    min-height: 3.25rem;
+  }
+
+  .dashboard-hero .hero-metrics {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+  }
+
+  .dashboard-stat-grid {
+    gap: 0.625rem;
+  }
+
+  .dashboard-stat-grid > .surface-card {
+    min-height: 8.25rem;
+    padding: 0.875rem;
+  }
+
+  .dashboard-stat-grid > .surface-card > p,
+  .dashboard-stat-grid > .surface-card > div + p {
+    margin-top: 0.75rem;
+  }
+
+  .budget-category-card {
+    min-height: 0;
+    padding: 1rem;
+  }
+
+  .money-edit-input {
+    min-height: 2.75rem;
+    padding-inline: 0.5rem;
+  }
+
+  .reserve-card {
+    min-height: 4.75rem;
+  }
+
+  .expense-amount-input {
+    font-size: 3.5rem !important;
+  }
+
+  .expense-category-button {
+    min-height: 3.375rem;
+  }
+
+  .expense-actions {
+    position: sticky;
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    margin-inline: -0.25rem;
+    padding: 0.625rem 0.25rem;
+    background: linear-gradient(to bottom, rgba(245, 248, 246, 0), rgba(245, 248, 246, 0.96) 28%);
+  }
+
+  .mobile-bottom-nav {
+    padding-top: 0.5rem;
+  }
+
+  .mobile-nav-button {
+    min-height: 3.5rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -120,5 +374,13 @@ input[type="month"] {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .dashboard-view,
+  .expense-page,
+  .settings-view,
+  .history-view,
+  .transactions-view {
+    animation: none;
   }
 }

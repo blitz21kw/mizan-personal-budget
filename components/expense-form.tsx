@@ -56,7 +56,7 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="surface-card overflow-hidden rounded-[28px]">
+      <div className="expense-amount-card surface-card overflow-hidden rounded-[28px]">
         <div className="border-b border-[#edf1ed] px-5 pb-4 pt-5 sm:px-6">
           <div className="flex items-center gap-2 text-xs font-extrabold tracking-[0.12em] text-[#9ba69f]"><Hash className="size-3.5 text-[#2d9b73]" /> المبلغ</div>
           <div className="mt-3 flex items-baseline gap-2 border-b border-[#dfe8e1] pb-3 focus-within:border-[#2d9b73]">
@@ -67,7 +67,7 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
               placeholder="0"
               value={amount}
               onChange={(event) => { setAmount(normalizeNumericInput(event.target.value)); setError(""); }}
-              className="number-ltr w-full min-w-0 bg-transparent text-5xl font-black tracking-[-0.07em] text-[#19382c] outline-none placeholder:text-[#d9e1dc] sm:text-6xl"
+              className="expense-amount-input number-ltr w-full min-w-0 bg-transparent text-5xl font-black tracking-[-0.07em] text-[#19382c] outline-none placeholder:text-[#d9e1dc] sm:text-6xl"
               aria-label="مبلغ المصروف"
             />
             <span className="shrink-0 text-sm font-black text-[#87958c]">د.ك</span>
@@ -90,7 +90,7 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
             {categories.map((category) => {
               const selected = category.id === categoryId;
               return (
-                <button key={category.id} type="button" onClick={() => { setCategoryId(category.id); setError(""); }} className={`flex min-h-12 items-center gap-2 rounded-2xl border px-3 text-right text-xs font-extrabold transition ${selected ? "border-[#9ad7b2] bg-[#eaf8ef] text-[#247955] shadow-[0_4px_12px_rgba(45,155,115,0.08)]" : "border-[#e6ece8] bg-white text-[#718078] hover:border-[#c9ded0] hover:bg-[#f7faf8]"}`}>
+                <button key={category.id} type="button" onClick={() => { setCategoryId(category.id); setError(""); }} className={`expense-category-button flex min-h-12 items-center gap-2 rounded-2xl border px-3 text-right text-xs font-extrabold transition ${selected ? "border-[#9ad7b2] bg-[#eaf8ef] text-[#247955] shadow-[0_4px_12px_rgba(45,155,115,0.08)]" : "border-[#e6ece8] bg-white text-[#718078] hover:border-[#c9ded0] hover:bg-[#f7faf8]"}`}>
                   <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
                   <span className="min-w-0 truncate">{category.name}</span>
                   {selected && <Check className="mr-auto size-3.5 shrink-0" />}
@@ -117,7 +117,7 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
 
       {error && <p role="alert" className="rounded-2xl bg-[#fff0ee] px-4 py-3 text-sm font-bold text-[#c45854]">{error}</p>}
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <div className="expense-actions flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         {onCancel && <button type="button" onClick={onCancel} className="min-h-13 rounded-2xl px-5 text-sm font-black text-[#7e8a83] transition hover:bg-[#edf2ee]">إلغاء</button>}
         <button type="submit" disabled={!categories.length} className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#2d9b73] px-5 text-sm font-black text-white shadow-[0_12px_22px_rgba(45,155,115,0.24)] transition hover:-translate-y-0.5 hover:bg-[#248662] active:translate-y-0 sm:max-w-xs">
           <Check className="size-4" strokeWidth={2.6} />

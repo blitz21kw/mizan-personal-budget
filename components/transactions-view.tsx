@@ -22,7 +22,7 @@ export default function TransactionsView({ monthKey, categories, expenses, onEdi
   }
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="transactions-view space-y-6 pb-2">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">التفاصيل اليومية</p>
@@ -32,7 +32,7 @@ export default function TransactionsView({ monthKey, categories, expenses, onEdi
         <div className="flex items-center gap-2 rounded-2xl bg-[#e9f7ee] px-4 py-3"><ReceiptText className="size-4 text-[#2d9b73]" /><span className="number-ltr text-sm font-black text-[#267c57]">{formatMoney(totalFiltered)}</span><span className="text-[11px] font-bold text-[#66927a]">المعروض</span></div>
       </header>
 
-      <section className="surface-card rounded-[26px] p-4 sm:p-5">
+      <section className="transactions-filter-card surface-card rounded-[26px] p-4 sm:p-5">
         <div className="flex items-center gap-2 text-xs font-extrabold tracking-[0.12em] text-[#9aa59f]"><Filter className="size-3.5 text-[#2d9b73]" /> تصفية حسب التصنيف</div>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
           <button type="button" onClick={() => setFilter("all")} className={`shrink-0 rounded-xl px-3.5 py-2.5 text-xs font-black transition ${filter === "all" ? "bg-[#19382c] text-white" : "bg-[#f2f6f3] text-[#809088] hover:bg-[#e8f2eb]"}`}>الكل <span className="mr-1 opacity-60">{expenses.length}</span></button>

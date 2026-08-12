@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Bell, Check, Menu, X } from "lucide-react";
+import { ArrowRight, Check, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import DashboardView from "@/components/dashboard-view";
 import ExpenseForm from "@/components/expense-form";
@@ -224,8 +224,8 @@ export default function BudgetApp() {
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[1500px] lg:flex-row">
         <DesktopSidebar activeView={activeView} onChange={changeView} />
-        <main className="min-w-0 flex-1 px-4 pb-4 pt-5 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
-          <div className="mx-auto max-w-[1180px]">
+        <main className="app-main-shell min-w-0 flex-1 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
+          <div className="app-content mx-auto max-w-[1180px]">
             <TopBar activeView={activeView} onChange={changeView} />
             {activeView === "dashboard" && <DashboardView month={activeMonth} onMonthChange={selectMonth} onUpdateMonthValue={updateMonthValue} onUpdateCategoryBudget={updateCategoryBudget} onUpdateCategorySpent={updateCategorySpent} onUpdateReserve={updateReserve} onAddExpense={() => changeView("add")} onOpenSettings={() => changeView("settings")} onOpenTransactions={() => changeView("transactions")} onOpenHistory={() => changeView("history")} />}
             {activeView === "add" && <AddExpenseView month={activeMonth} onSave={addExpense} onCancel={() => changeView("dashboard")} />}
@@ -246,11 +246,11 @@ export default function BudgetApp() {
 
 function TopBar({ activeView, onChange }: { activeView: AppView; onChange: (view: AppView) => void }) {
   const titles: Record<AppView, string> = { dashboard: "نظرة عامة", add: "صرف جديد", settings: "الإعدادات", history: "السجل الشهري", transactions: "المصروفات" };
-  return <div className="mb-6 flex items-center justify-between gap-3 lg:mb-8"><div className="flex items-center gap-2 lg:hidden">{activeView !== "dashboard" && <button type="button" onClick={() => onChange("dashboard")} className="flex size-10 items-center justify-center rounded-xl bg-white text-[#789086] shadow-sm" aria-label="العودة للرئيسية"><ArrowRight className="size-4" /></button>}<span className="text-sm font-black text-[#436052]">{titles[activeView]}</span></div><div className="hidden items-center gap-2 text-xs font-bold text-[#91a099] lg:flex"><span>ميزانيتك الشخصية</span><span className="text-[#cbd6cf]">/</span><span className="text-[#3d5949]">{titles[activeView]}</span></div><div className="mr-auto flex items-center gap-2"><button type="button" onClick={() => onChange("add")} className="hidden min-h-10 items-center gap-2 rounded-xl bg-[#e6f4eb] px-3.5 text-xs font-black text-[#247955] transition hover:bg-[#d7efdf] sm:flex"><span className="text-base leading-none">+</span> صرف جديد</button><button type="button" className="flex size-10 items-center justify-center rounded-xl bg-white text-[#8a9890] shadow-sm" aria-label="الإشعارات"><Bell className="size-[17px]" /></button><button type="button" className="flex size-10 items-center justify-center rounded-xl bg-white text-[#8a9890] shadow-sm lg:hidden" aria-label="القائمة"><Menu className="size-[17px]" /></button></div></div>;
+  return <div className="app-topbar mb-5 flex items-center justify-between gap-3 lg:mb-8"><div className="flex items-center gap-2">{activeView !== "dashboard" && <button type="button" onClick={() => onChange("dashboard")} className="flex size-10 items-center justify-center rounded-xl border border-[#e4ece6] bg-white/90 text-[#789086] shadow-sm" aria-label="العودة للرئيسية"><ArrowRight className="size-4" /></button>}<span className="text-sm font-black text-[#436052] lg:hidden">{titles[activeView]}</span><div className="hidden items-center gap-2 text-xs font-bold text-[#91a099] lg:flex"><span>ميزانيتك الشخصية</span><span className="text-[#cbd6cf]">/</span><span className="text-[#3d5949]">{titles[activeView]}</span></div></div><div className="mr-auto"><button type="button" onClick={() => onChange("add")} className="hidden min-h-10 items-center gap-2 rounded-xl bg-[#e6f4eb] px-3.5 text-xs font-black text-[#247955] transition hover:bg-[#d7efdf] sm:flex"><span className="text-base leading-none">+</span> صرف جديد</button></div></div>;
 }
 
 function AddExpenseView({ month, onSave, onCancel }: { month: MonthData; onSave: (draft: ExpenseDraft) => void; onCancel: () => void }) {
-  return <div className="mx-auto max-w-2xl space-y-6 pb-2"><header className="flex items-start gap-3"><button type="button" onClick={onCancel} className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#789086] shadow-sm" aria-label="إلغاء"><ArrowRight className="size-4" /></button><div><p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">إضافة سريعة</p><h1 className="mt-2 text-[clamp(1.75rem,5vw,2.65rem)] font-black leading-[1.12] tracking-[-0.06em] text-[#19382c]">صرف جديد</h1><p className="mt-2 text-sm leading-6 text-[#7d8982]">سجّلها الآن، وخلّ الباقي على ميزان.</p></div></header><ExpenseForm categories={month.categories} onSave={onSave} onCancel={onCancel} /></div>;
+  return <div className="expense-page mx-auto max-w-2xl space-y-5 pb-2"><header className="flex items-start gap-3"><button type="button" onClick={onCancel} className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#e4ece6] bg-white text-[#789086] shadow-sm" aria-label="إلغاء"><ArrowRight className="size-4" /></button><div><p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">إضافة سريعة</p><h1 className="mt-2 text-[clamp(1.75rem,5vw,2.65rem)] font-black leading-[1.12] tracking-[-0.06em] text-[#19382c]">صرف جديد</h1><p className="mt-2 text-sm leading-6 text-[#7d8982]">سجّلها الآن، وخلّ الباقي على ميزان.</p></div></header><ExpenseForm categories={month.categories} onSave={onSave} onCancel={onCancel} /></div>;
 }
 
 function LoadingShell() {

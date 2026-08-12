@@ -50,8 +50,8 @@ export default function DashboardView({
   const monthLabel = formatMonthLabel(month.monthKey);
 
   return (
-    <div className="space-y-6 pb-2">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div className="dashboard-view space-y-6 pb-2">
+      <header className="dashboard-header flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">لوحة التحكم</p>
           <h1 className="mt-2 text-[clamp(1.75rem,5vw,2.65rem)] font-black leading-[1.12] tracking-[-0.06em] text-[#19382c]">
@@ -62,7 +62,7 @@ export default function DashboardView({
         <MonthSelect monthKey={month.monthKey} onChange={onMonthChange} />
       </header>
 
-      <section className="relative isolate overflow-hidden rounded-[32px] bg-[#163329] p-5 text-white shadow-[0_24px_55px_rgba(24,67,48,0.2)] sm:p-7">
+      <section className="dashboard-hero relative isolate overflow-hidden rounded-[32px] bg-[#163329] p-5 text-white shadow-[0_24px_55px_rgba(24,67,48,0.2)] sm:p-7">
         <div className="pointer-events-none absolute -left-10 -top-24 -z-10 size-72 rounded-full bg-[#6ed39b]/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 right-10 -z-10 size-64 rounded-full border-[24px] border-[#8de0ae]/[0.08]" />
         <div className="pointer-events-none absolute right-1/2 top-1/2 -z-10 size-56 -translate-y-1/2 rounded-full bg-[#d2f3dc]/[0.04] blur-2xl" />
@@ -85,7 +85,7 @@ export default function DashboardView({
           <button
             type="button"
             onClick={onAddExpense}
-            className="group flex min-h-14 items-center justify-center gap-3 rounded-2xl bg-[#c8f1d7] px-5 text-sm font-black text-[#16412e] shadow-[0_12px_22px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:bg-white active:translate-y-0 sm:min-w-44"
+            className="hero-action group flex min-h-14 items-center justify-center gap-3 rounded-2xl bg-[#c8f1d7] px-5 text-sm font-black text-[#16412e] shadow-[0_12px_22px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:bg-white active:translate-y-0 sm:min-w-44"
           >
             <span className="flex size-8 items-center justify-center rounded-xl bg-[#2d9b73] text-white transition group-hover:rotate-90">
               <Plus className="size-4" strokeWidth={2.6} />
@@ -94,7 +94,7 @@ export default function DashboardView({
           </button>
         </div>
 
-        <div className="relative mt-8 grid grid-cols-2 gap-3 border-t border-white/10 pt-4 sm:max-w-xl sm:grid-cols-3">
+        <div className="hero-metrics relative mt-8 grid grid-cols-2 gap-3 border-t border-white/10 pt-4 sm:max-w-xl sm:grid-cols-3">
           <EditableHeroMetric label="المصروف حتى الآن" value={totals.totalSpent} icon={ArrowUpLeft} onChange={(value) => onUpdateMonthValue("totalSpent", value)} />
           <HeroMetric label="المحجوز" value={formatMoney(totals.reserves)} icon={ShieldCheck} />
           <div className="col-span-2 mt-2 hidden items-center gap-2 text-[11px] text-[#9ec4ad] sm:col-span-1 sm:mt-0 sm:flex sm:justify-end sm:text-left">
@@ -104,14 +104,14 @@ export default function DashboardView({
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="dashboard-stat-grid grid grid-cols-2 gap-3 sm:grid-cols-4">
         <EditableStatCard label="الراتب الأصلي" value={month.salary} icon={Banknote} tone="green" onChange={(value) => onUpdateMonthValue("salary", value)} />
         <EditableStatCard label="الاستقطاع" value={month.deductions} icon={CreditCard} tone="orange" prefix="−" onChange={(value) => onUpdateMonthValue("deductions", value)} />
         <StatCard label="صافي الراتب" value={totals.netSalary} icon={Coins} tone="blue" />
         <StatCard label="الميزانيات الثابتة" value={totals.fixedAllocations} icon={Landmark} tone="purple" />
       </section>
 
-      <section className="surface-card rounded-[28px] p-5 sm:p-6">
+      <section className="plan-card surface-card rounded-[28px] p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold tracking-[0.12em] text-[#9aa59f]">توزيع الراتب</p>
@@ -270,7 +270,7 @@ function CategoryCard({ category, spent, onBudgetChange, onSpentChange }: { cate
   const statusClass = isOver ? "bg-[#fff0ee] text-[#c65b57]" : isApproaching ? "bg-[#fff5e9] text-[#c17d2f]" : "bg-[#eef8f1] text-[#308361]";
 
   return (
-    <article className={`surface-card rounded-[25px] p-4 transition hover:-translate-y-0.5 ${isOver ? "border-[#f1c1bc] bg-[#fffafa]" : ""}`}>
+    <article className={`budget-category-card surface-card rounded-[25px] p-4 transition hover:-translate-y-0.5 ${isOver ? "border-[#f1c1bc] bg-[#fffafa]" : ""}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-[16px]" style={{ backgroundColor: `${category.color}1A`, color: category.color }}>
@@ -309,7 +309,7 @@ function ReserveCard({ label, value, helper, icon: Icon, tone, onChange }: { lab
     lavender: "bg-[#f2ebfb] text-[#9d6bc3]",
   }[tone];
   return (
-    <div className="surface-card flex items-center gap-3 rounded-[23px] p-4">
+    <div className="reserve-card surface-card flex items-center gap-3 rounded-[23px] p-4">
       <span className={`flex size-11 shrink-0 items-center justify-center rounded-[16px] ${classes}`}><Icon className="size-[19px]" /></span>
       <div className="min-w-0">
         <p className="truncate text-xs font-bold text-[#8a978f]">{label}</p>
@@ -350,7 +350,7 @@ function BudgetAmountInput({ value, label, onCommit, compact = false }: { value:
           event.currentTarget.blur();
         }
       }}
-      className={`number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[4.5rem] text-sm" : "w-[4.75rem] text-[11px]"}`}
+      className={`money-edit-input number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[4.5rem] text-sm" : "w-[4.75rem] text-[11px]"}`}
     />
   );
 }
@@ -377,7 +377,7 @@ function InlineMoneyInput({ value, label, onCommit, compact = false }: { value: 
       onChange={(event) => setDraft(normalizeNumericInput(event.target.value))}
       onBlur={commit}
       onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}
-      className={`number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[3.8rem] text-[11px]" : "w-[4.75rem] text-sm"}`}
+      className={`money-edit-input number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[3.8rem] text-[11px]" : "w-[4.75rem] text-sm"}`}
     />
   );
 }
