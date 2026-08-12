@@ -76,7 +76,15 @@ export default function BudgetApp() {
       return {
         ...previous,
         activeMonthKey: targetMonthKey,
-        months: { ...previous.months, [targetMonthKey]: { ...targetMonth, expenses: [...targetMonth.expenses, expense] } },
+        months: {
+          ...previous.months,
+          [targetMonthKey]: {
+            ...targetMonth,
+            totalSpent: targetMonth.totalSpent + expense.amount,
+            categories: targetMonth.categories.map((category) => category.id === expense.categoryId ? { ...category, spent: category.spent + expense.amount } : category),
+            expenses: [...targetMonth.expenses, expense],
+          },
+        },
       };
     });
     changeView("dashboard");
@@ -94,11 +102,32 @@ export default function BudgetApp() {
       const nextMonths = { ...previous.months };
 
       if (sourceMonthKey === targetMonthKey) {
-        nextMonths[sourceMonthKey] = { ...sourceMonth, expenses: sourceMonth.expenses.map((expense) => expense.id === expenseId ? updatedExpense : expense) };
+        const amountDelta = updatedExpense.amount - existingExpense.amount;
+        nextMonths[sourceMonthKey] = {
+          ...sourceMonth,
+          totalSpent: Math.max(0, sourceMonth.totalSpent + amountDelta),
+          categories: sourceMonth.categories.map((category) => {
+            if (category.id === existingExpense.categoryId && category.id === updatedExpense.categoryId) return { ...category, spent: Math.max(0, category.spent + amountDelta) };
+            if (category.id === existingExpense.categoryId) return { ...category, spent: Math.max(0, category.spent - existingExpense.amount) };
+            if (category.id === updatedExpense.categoryId) return { ...category, spent: category.spent + updatedExpense.amount };
+            return category;
+          }),
+          expenses: sourceMonth.expenses.map((expense) => expense.id === expenseId ? updatedExpense : expense),
+        };
       } else {
         const targetMonth = previous.months[targetMonthKey] ?? createMonth(targetMonthKey, sourceMonth);
-        nextMonths[sourceMonthKey] = { ...sourceMonth, expenses: sourceMonth.expenses.filter((expense) => expense.id !== expenseId) };
-        nextMonths[targetMonthKey] = { ...targetMonth, expenses: [...targetMonth.expenses, updatedExpense] };
+        nextMonths[sourceMonthKey] = {
+          ...sourceMonth,
+          totalSpent: Math.max(0, sourceMonth.totalSpent - existingExpense.amount),
+          categories: sourceMonth.categories.map((category) => category.id === existingExpense.categoryId ? { ...category, spent: Math.max(0, category.spent - existingExpense.amount) } : category),
+          expenses: sourceMonth.expenses.filter((expense) => expense.id !== expenseId),
+        };
+        nextMonths[targetMonthKey] = {
+          ...targetMonth,
+          totalSpent: targetMonth.totalSpent + updatedExpense.amount,
+          categories: targetMonth.categories.map((category) => category.id === updatedExpense.categoryId ? { ...category, spent: category.spent + updatedExpense.amount } : category),
+          expenses: [...targetMonth.expenses, updatedExpense],
+        };
       }
       return { ...previous, activeMonthKey: targetMonthKey, months: nextMonths };
     });
@@ -110,7 +139,20 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
-      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: { ...month, expenses: month.expenses.filter((expense) => expense.id !== expenseId) } } };
+      const expense = month.expenses.find((item) => item.id === expenseId);
+      if (!expense) return previous;
+      return {
+        ...previous,
+        months: {
+          ...previous.months,
+          [previous.activeMonthKey]: {
+            ...month,
+            totalSpent: Math.max(0, month.totalSpent - expense.amount),
+            categories: month.categories.map((category) => category.id === expense.categoryId ? { ...category, spent: Math.max(0, category.spent - expense.amount) } : category),
+            expenses: month.expenses.filter((item) => item.id !== expenseId),
+          },
+        },
+      };
     });
     notify("تم حذف المصروف.");
   }, [notify]);
@@ -124,6 +166,56 @@ export default function BudgetApp() {
     notify("تم حفظ إعدادات هذا الشهر.");
   }, [notify]);
 
+  const updateCategoryBudget = useCallback((categoryId: string, budget: number) => {
+    setState((previous) => {
+      const month = previous.months[previous.activeMonthKey];
+      if (!month) return previous;
+      return {
+        ...previous,
+        months: {
+          ...previous.months,
+          [previous.activeMonthKey]: {
+            ...month,
+            categories: month.categories.map((category) => category.id === categoryId ? { ...category, budget } : category),
+          },
+        },
+      };
+    });
+  }, []);
+
+  const updateReserve = useCallback((field: "investment" | "emergencyFund" | "outings", amount: number) => {
+    setState((previous) => {
+      const month = previous.months[previous.activeMonthKey];
+      if (!month) return previous;
+      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: { ...month, [field]: amount } } };
+    });
+  }, []);
+
+  const updateMonthValue = useCallback((field: "salary" | "deductions" | "totalSpent" | "savingsThisMonth", amount: number) => {
+    setState((previous) => {
+      const month = previous.months[previous.activeMonthKey];
+      if (!month) return previous;
+      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: { ...month, [field]: amount } } };
+    });
+  }, []);
+
+  const updateCategorySpent = useCallback((categoryId: string, spent: number) => {
+    setState((previous) => {
+      const month = previous.months[previous.activeMonthKey];
+      if (!month) return previous;
+      const nextCategories = month.categories.map((category) => category.id === categoryId ? { ...category, spent } : category);
+      const currentSpent = month.categories.find((category) => category.id === categoryId)?.spent ?? 0;
+      const manualTotal = Math.max(0, month.totalSpent + spent - currentSpent);
+      return {
+        ...previous,
+        months: {
+          ...previous.months,
+          [previous.activeMonthKey]: { ...month, categories: nextCategories, totalSpent: manualTotal },
+        },
+      };
+    });
+  }, []);
+
   const startEditing = useCallback((expense: Expense) => setEditingExpense({ monthKey: state.activeMonthKey, expense }), [state.activeMonthKey]);
 
   if (!hydrated || !activeMonth) return <LoadingShell />;
@@ -135,7 +227,7 @@ export default function BudgetApp() {
         <main className="min-w-0 flex-1 px-4 pb-4 pt-5 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
           <div className="mx-auto max-w-[1180px]">
             <TopBar activeView={activeView} onChange={changeView} />
-            {activeView === "dashboard" && <DashboardView month={activeMonth} monthKeys={monthKeys} onMonthChange={selectMonth} onAddExpense={() => changeView("add")} onOpenSettings={() => changeView("settings")} onOpenTransactions={() => changeView("transactions")} onOpenHistory={() => changeView("history")} />}
+            {activeView === "dashboard" && <DashboardView month={activeMonth} onMonthChange={selectMonth} onUpdateMonthValue={updateMonthValue} onUpdateCategoryBudget={updateCategoryBudget} onUpdateCategorySpent={updateCategorySpent} onUpdateReserve={updateReserve} onAddExpense={() => changeView("add")} onOpenSettings={() => changeView("settings")} onOpenTransactions={() => changeView("transactions")} onOpenHistory={() => changeView("history")} />}
             {activeView === "add" && <AddExpenseView month={activeMonth} onSave={addExpense} onCancel={() => changeView("dashboard")} />}
             {activeView === "settings" && <SettingsView month={activeMonth} onSave={saveSettings} />}
             {activeView === "history" && <HistoryView months={state.months} activeMonthKey={state.activeMonthKey} monthKeys={monthKeys} onMonthChange={selectMonth} onCreateMonth={createNewMonth} />}

@@ -9,6 +9,7 @@ export type Category = {
   id: string;
   name: string;
   budget: number;
+  spent: number;
   color: string;
   isDefault?: boolean;
 };
@@ -27,6 +28,8 @@ export type MonthData = {
   salary: number;
   deductions: number;
   categories: Category[];
+  totalSpent: number;
+  savingsThisMonth: number;
   expenses: Expense[];
   investment: number;
   emergencyFund: number;
@@ -48,5 +51,12 @@ export type ExpenseDraft = {
 
 export type MonthSettings = Pick<
   MonthData,
-  "salary" | "deductions" | "categories" | "investment" | "emergencyFund" | "outings"
+  | "salary"
+  | "deductions"
+  | "categories"
+  | "totalSpent"
+  | "savingsThisMonth"
+  | "investment"
+  | "emergencyFund"
+  | "outings"
 >;

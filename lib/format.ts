@@ -67,19 +67,25 @@ export function getMonthTotals(month: {
   deductions: number;
   categories: { budget: number }[];
   expenses: { amount: number }[];
+  totalSpent?: number;
+  savingsThisMonth?: number;
   investment: number;
   emergencyFund: number;
   outings: number;
 }) {
   const netSalary = month.salary - month.deductions;
-  const totalSpent = month.expenses.reduce((total, expense) => total + expense.amount, 0);
+  const totalSpent = typeof month.totalSpent === "number"
+    ? Math.max(0, month.totalSpent)
+    : month.expenses.reduce((total, expense) => total + expense.amount, 0);
   const fixedAllocations = month.categories.reduce((total, category) => total + category.budget, 0);
-  const reserves = month.investment + month.emergencyFund + month.outings;
+  const savingsThisMonth = Math.max(0, month.savingsThisMonth ?? 0);
+  const reserves = month.investment + month.emergencyFund + month.outings + savingsThisMonth;
 
   return {
     netSalary,
     totalSpent,
     fixedAllocations,
+    savingsThisMonth,
     reserves,
     remaining: netSalary - totalSpent - reserves,
     afterFixedAllocations: netSalary - fixedAllocations - reserves,

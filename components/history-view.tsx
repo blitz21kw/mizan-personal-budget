@@ -1,6 +1,6 @@
 import { ArrowLeft, CalendarPlus, CircleDollarSign, Clock3, Landmark, ShieldCheck, WalletCards } from "lucide-react";
 import { useMemo, useState } from "react";
-import { formatMoney, formatMonthLabel, getCategorySpent, getMonthTotals } from "@/lib/format";
+import { formatMoney, formatMonthLabel, getMonthTotals } from "@/lib/format";
 import type { MonthData } from "@/lib/types";
 
 type HistoryViewProps = {
@@ -18,7 +18,7 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
 
   const categoryRows = useMemo(() => {
     if (!month) return [];
-    return month.categories.map((category) => ({ category, spent: getCategorySpent(month.expenses, category.id) })).sort((a, b) => b.spent - a.spent);
+    return month.categories.map((category) => ({ category, spent: category.spent })).sort((a, b) => b.spent - a.spent);
   }, [month]);
 
   function handleCreateMonth() {
@@ -58,6 +58,7 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
           <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:min-w-64">
             <HistoryMetric label="صافي الراتب" value={formatMoney(totals.netSalary)} />
             <HistoryMetric label="المصروفات" value={formatMoney(totals.totalSpent)} />
+            <HistoryMetric label="ادخار هذا الشهر" value={formatMoney(month.savingsThisMonth)} />
             <HistoryMetric label="الاستثمار" value={formatMoney(month.investment)} />
             <HistoryMetric label="الطوارئ" value={formatMoney(month.emergencyFund)} />
           </div>
@@ -76,10 +77,10 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
         <div className="mt-5 divide-y divide-[#edf1ed]">
           {!categoryRows.length && <p className="py-8 text-center text-sm font-bold text-[#8b9890]">لا توجد ميزانيات في هذا الشهر.</p>}
           {categoryRows.map(({ category, spent }) => {
-            const ratio = category.budget > 0 ? spent / category.budget : 0;
+              const ratio = category.budget > 0 ? category.spent / category.budget : 0;
             return <div key={category.id} className="py-4 first:pt-0 last:pb-0">
-              <div className="flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2.5"><span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: category.color }} /><span className="truncate text-sm font-black text-[#3b5143]">{category.name}</span></div><span className={`number-ltr text-xs font-black ${spent > category.budget ? "text-[#d15d58]" : "text-[#40594a]"}`}>{formatMoney(spent)} <span className="font-bold text-[#99a59d]">من {formatMoney(category.budget)}</span></span></div>
-              <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-[#eff3ef]"><div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, ratio * 100))}%`, backgroundColor: spent > category.budget ? "#db645d" : category.color }} /></div>
+              <div className="flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2.5"><span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: category.color }} /><span className="truncate text-sm font-black text-[#3b5143]">{category.name}</span></div><span className={`number-ltr text-xs font-black ${category.spent > category.budget ? "text-[#d15d58]" : "text-[#40594a]"}`}>{formatMoney(category.spent)} <span className="font-bold text-[#99a59d]">من {formatMoney(category.budget)}</span></span></div>
+              <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-[#eff3ef]"><div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, ratio * 100))}%`, backgroundColor: category.spent > category.budget ? "#db645d" : category.color }} /></div>
             </div>;
           })}
         </div>

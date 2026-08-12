@@ -12,6 +12,8 @@ type SettingsViewProps = {
 export default function SettingsView({ month, onSave }: SettingsViewProps) {
   const [salary, setSalary] = useState(String(month.salary));
   const [deductions, setDeductions] = useState(String(month.deductions));
+  const [totalSpent, setTotalSpent] = useState(String(month.totalSpent));
+  const [savingsThisMonth, setSavingsThisMonth] = useState(String(month.savingsThisMonth));
   const [investment, setInvestment] = useState(String(month.investment));
   const [emergencyFund, setEmergencyFund] = useState(String(month.emergencyFund));
   const [outings, setOutings] = useState(String(month.outings));
@@ -24,6 +26,8 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
   useEffect(() => {
     setSalary(String(month.salary));
     setDeductions(String(month.deductions));
+    setTotalSpent(String(month.totalSpent));
+    setSavingsThisMonth(String(month.savingsThisMonth));
     setInvestment(String(month.investment));
     setEmergencyFund(String(month.emergencyFund));
     setOutings(String(month.outings));
@@ -32,7 +36,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
   }, [month]);
 
   const numeric = (value: string) => Math.max(0, Number.parseFloat(normalizeNumericInput(value)) || 0);
-  const totals = useMemo(() => getMonthTotals({ salary: numeric(salary), deductions: numeric(deductions), categories, expenses: month.expenses, investment: numeric(investment), emergencyFund: numeric(emergencyFund), outings: numeric(outings) }), [categories, deductions, emergencyFund, investment, month.expenses, outings, salary]);
+  const totals = useMemo(() => getMonthTotals({ salary: numeric(salary), deductions: numeric(deductions), categories, expenses: month.expenses, totalSpent: numeric(totalSpent), savingsThisMonth: numeric(savingsThisMonth), investment: numeric(investment), emergencyFund: numeric(emergencyFund), outings: numeric(outings) }), [categories, deductions, emergencyFund, investment, month.expenses, outings, salary, savingsThisMonth, totalSpent]);
 
   function updateCategory(id: string, value: string) {
     setCategories((items) => items.map((category) => category.id === id ? { ...category, budget: numeric(value) } : category));
@@ -59,7 +63,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
       setMessage("هذا التصنيف موجود بالفعل.");
       return;
     }
-    setCategories((items) => [...items, { id: `custom-${Date.now()}`, name, budget, color: newCategoryColor }]);
+    setCategories((items) => [...items, { id: `custom-${Date.now()}`, name, budget, spent: 0, color: newCategoryColor }]);
     setNewCategoryName("");
     setNewCategoryBudget("");
     setMessage("");
@@ -69,6 +73,8 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
     onSave({
       salary: numeric(salary),
       deductions: numeric(deductions),
+      totalSpent: numeric(totalSpent),
+      savingsThisMonth: numeric(savingsThisMonth),
       investment: numeric(investment),
       emergencyFund: numeric(emergencyFund),
       outings: numeric(outings),
@@ -102,6 +108,10 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
         <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#f3f8f4] px-4 py-3">
           <span className="text-xs font-bold text-[#76877c]">صافي الراتب المحسوب</span>
           <span className="number-ltr text-base font-black text-[#23835e]">{formatMoney(totals.netSalary)}</span>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <MoneyInput label="إجمالي المصروف" value={totalSpent} onChange={setTotalSpent} icon={WalletCards} />
+          <MoneyInput label="مدخرات هذا الشهر" value={savingsThisMonth} onChange={setSavingsThisMonth} icon={ShieldCheck} />
         </div>
       </section>
 

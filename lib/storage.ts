@@ -1,5 +1,5 @@
 import { DEFAULT_CATEGORIES, DEFAULT_DEDUCTIONS, DEFAULT_SALARY, STORAGE_KEY } from "@/lib/constants";
-import { getMonthKey } from "@/lib/format";
+import { getCategorySpent, getMonthKey } from "@/lib/format";
 import type { BudgetState, Category, MonthData } from "@/lib/types";
 
 function numberOr(value: unknown, fallback: number) {
@@ -7,7 +7,7 @@ function numberOr(value: unknown, fallback: number) {
 }
 
 function copyCategories(categories: Category[]) {
-  return categories.map((category) => ({ ...category }));
+  return categories.map((category) => ({ ...category, spent: 0 }));
 }
 
 export function createMonth(monthKey = getMonthKey(new Date()), template?: MonthData): MonthData {
@@ -18,6 +18,8 @@ export function createMonth(monthKey = getMonthKey(new Date()), template?: Month
     salary: numberOr(template?.salary, DEFAULT_SALARY),
     deductions: numberOr(template?.deductions, DEFAULT_DEDUCTIONS),
     categories,
+    totalSpent: 0,
+    savingsThisMonth: 0,
     expenses: [],
     investment: numberOr(template?.investment, 0),
     emergencyFund: numberOr(template?.emergencyFund, 0),
@@ -43,6 +45,7 @@ function normalizeCategory(category: unknown, index: number): Category | null {
     id: candidate.id,
     name: candidate.name,
     budget: Math.max(0, numberOr(candidate.budget, 0)),
+    spent: Math.max(0, numberOr(candidate.spent, 0)),
     color: typeof candidate.color === "string" ? candidate.color : DEFAULT_CATEGORIES[index % DEFAULT_CATEGORIES.length].color,
     isDefault: candidate.isDefault === true || DEFAULT_CATEGORIES.some((item) => item.id === candidate.id),
   };
@@ -68,11 +71,20 @@ function normalizeMonth(monthKey: string, value: unknown, fallback?: MonthData):
         }))
     : [];
 
+  const normalizedCategories = categories.length ? categories : copyCategories(fallback?.categories ?? DEFAULT_CATEGORIES);
+  const totalSpent = Math.max(0, numberOr(candidate.totalSpent, expenses.reduce((total, expense) => total + expense.amount, 0)));
+  const rawCategories = Array.isArray(candidate.categories) ? candidate.categories : [];
+
   return {
     monthKey,
     salary: numberOr(candidate.salary, fallback?.salary ?? DEFAULT_SALARY),
     deductions: numberOr(candidate.deductions, fallback?.deductions ?? DEFAULT_DEDUCTIONS),
-    categories: categories.length ? categories : copyCategories(fallback?.categories ?? DEFAULT_CATEGORIES),
+    categories: normalizedCategories.map((category) => ({
+      ...category,
+      spent: numberOr(rawCategories.find((item) => item?.id === category.id)?.spent, getCategorySpent(expenses, category.id)),
+    })),
+    totalSpent,
+    savingsThisMonth: Math.max(0, numberOr(candidate.savingsThisMonth, fallback?.savingsThisMonth ?? 0)),
     expenses,
     investment: numberOr(candidate.investment, fallback?.investment ?? 0),
     emergencyFund: numberOr(candidate.emergencyFund, fallback?.emergencyFund ?? 0),
