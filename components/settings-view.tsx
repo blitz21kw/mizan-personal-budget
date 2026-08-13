@@ -1,8 +1,8 @@
 import { Check, ChevronLeft, CirclePlus, Coins, PenLine, Plus, ShieldCheck, Trash2, TrendingUp, WalletCards } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CATEGORY_COLORS } from "@/lib/constants";
-import { formatMoney, getMonthTotals, normalizeNumericInput } from "@/lib/format";
-import type { Category, MonthData, MonthSettings } from "@/lib/types";
+import { formatMoney, getAutomaticReserveAllocation, getMonthTotals, normalizeNumericInput } from "@/lib/format";
+import type { Category, MonthData, MonthSettings, ReserveAllocationMode } from "@/lib/types";
 
 type SettingsViewProps = {
   month: MonthData;
@@ -17,6 +17,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
   const [investment, setInvestment] = useState(String(month.investment));
   const [emergencyFund, setEmergencyFund] = useState(String(month.emergencyFund));
   const [outings, setOutings] = useState(String(month.outings));
+  const [reserveAllocationMode, setReserveAllocationMode] = useState<ReserveAllocationMode>(month.reserveAllocationMode);
   const [categories, setCategories] = useState<Category[]>(month.categories);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryBudget, setNewCategoryBudget] = useState("");
@@ -31,11 +32,21 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
     setInvestment(String(month.investment));
     setEmergencyFund(String(month.emergencyFund));
     setOutings(String(month.outings));
+    setReserveAllocationMode(month.reserveAllocationMode);
     setCategories(month.categories.map((category) => ({ ...category })));
     setMessage("");
   }, [month]);
 
   const numeric = (value: string) => Math.max(0, Number.parseFloat(normalizeNumericInput(value)) || 0);
+  const automaticAllocation = useMemo(() => getAutomaticReserveAllocation({ salary: numeric(salary), deductions: numeric(deductions), categories, savingsThisMonth: numeric(savingsThisMonth) }), [categories, deductions, salary, savingsThisMonth]);
+
+  useEffect(() => {
+    if (reserveAllocationMode !== "auto") return;
+    setInvestment(String(automaticAllocation.investment));
+    setEmergencyFund(String(automaticAllocation.emergencyFund));
+    setOutings(String(automaticAllocation.outings));
+  }, [automaticAllocation, reserveAllocationMode]);
+
   const totals = useMemo(() => getMonthTotals({ salary: numeric(salary), deductions: numeric(deductions), categories, expenses: month.expenses, totalSpent: numeric(totalSpent), savingsThisMonth: numeric(savingsThisMonth), investment: numeric(investment), emergencyFund: numeric(emergencyFund), outings: numeric(outings) }), [categories, deductions, emergencyFund, investment, month.expenses, outings, salary, savingsThisMonth, totalSpent]);
 
   function updateCategory(id: string, value: string) {
@@ -70,14 +81,19 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
   }
 
   function handleSave() {
+    const savedAllocation = reserveAllocationMode === "auto"
+      ? automaticAllocation
+      : { investment: numeric(investment), emergencyFund: numeric(emergencyFund), outings: numeric(outings) };
+
     onSave({
       salary: numeric(salary),
       deductions: numeric(deductions),
       totalSpent: numeric(totalSpent),
       savingsThisMonth: numeric(savingsThisMonth),
-      investment: numeric(investment),
-      emergencyFund: numeric(emergencyFund),
-      outings: numeric(outings),
+      investment: savedAllocation.investment,
+      emergencyFund: savedAllocation.emergencyFund,
+      outings: savedAllocation.outings,
+      reserveAllocationMode,
       categories: categories.map((category) => ({ ...category, budget: Math.round(category.budget * 1000) / 1000 })),
     });
     setMessage("تم حفظ إعدادات هذا الشهر.");
@@ -116,15 +132,23 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
       </section>
 
       <section className="settings-card surface-card rounded-[28px] p-5 sm:p-6">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
           <span className="flex size-10 items-center justify-center rounded-2xl bg-[#f1ebfb] text-[#9d6bc3]"><TrendingUp className="size-[18px]" /></span>
-          <div><h2 className="text-lg font-black text-[#19382c]">تخصيصات إضافية</h2><p className="mt-1 text-xs font-semibold text-[#8d9991]">مبالغ تحجزها قبل الصرف اليومي.</p></div>
+            <div><h2 className="text-lg font-black text-[#19382c]">تخصيصات إضافية</h2><p className="mt-1 text-xs font-semibold text-[#8d9991]">مبالغ تحجزها قبل الصرف اليومي.</p></div>
+          </div>
+          {reserveAllocationMode === "auto" ? (
+            <span className="shrink-0 rounded-full bg-[#eaf8ef] px-2.5 py-1 text-[10px] font-black text-[#2d805b]">حسبة تلقائية</span>
+          ) : (
+            <button type="button" onClick={() => setReserveAllocationMode("auto")} className="shrink-0 text-[10px] font-black text-[#2d9b73] transition hover:text-[#176a4b]">إرجاع الحسبة</button>
+          )}
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <MoneyInput label="الاستثمار" value={investment} onChange={setInvestment} icon={TrendingUp} />
-          <MoneyInput label="صندوق الطوارئ" value={emergencyFund} onChange={setEmergencyFund} icon={ShieldCheck} />
-          <MoneyInput label="طلعات ومطاعم" value={outings} onChange={setOutings} icon={CirclePlus} />
+          <MoneyInput label="الاستثمار" value={investment} onChange={(value) => { setReserveAllocationMode("manual"); setInvestment(value); }} icon={TrendingUp} />
+          <MoneyInput label="صندوق الطوارئ" value={emergencyFund} onChange={(value) => { setReserveAllocationMode("manual"); setEmergencyFund(value); }} icon={ShieldCheck} />
+          <MoneyInput label="طلعات ومطاعم" value={outings} onChange={(value) => { setReserveAllocationMode("manual"); setOutings(value); }} icon={CirclePlus} />
         </div>
+        <p className="mt-4 text-[11px] font-semibold leading-5 text-[#87948b]">المتاح {formatMoney(automaticAllocation.available)} يتوزع تلقائياً بنسبة 150 / 100 / 65، والاستثمار لا يقل عن 100 د.ك إذا كان المبلغ يسمح.</p>
       </section>
 
       <section className="settings-card surface-card rounded-[28px] p-5 sm:p-6">

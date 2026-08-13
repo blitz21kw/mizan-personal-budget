@@ -1,6 +1,6 @@
 import { DEFAULT_CATEGORIES, DEFAULT_DEDUCTIONS, DEFAULT_SALARY, STORAGE_KEY } from "@/lib/constants";
-import { getCategorySpent, getMonthKey } from "@/lib/format";
-import type { BudgetState, Category, MonthData } from "@/lib/types";
+import { getAutomaticReserveAllocation, getCategorySpent, getMonthKey } from "@/lib/format";
+import type { BudgetState, Category, MonthData, ReserveAllocationMode } from "@/lib/types";
 
 function numberOr(value: unknown, fallback: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
@@ -13,7 +13,7 @@ function copyCategories(categories: Category[]) {
 export function createMonth(monthKey = getMonthKey(new Date()), template?: MonthData): MonthData {
   const categories = template?.categories?.length ? copyCategories(template.categories) : copyCategories(DEFAULT_CATEGORIES);
 
-  return {
+  const month: MonthData = {
     monthKey,
     salary: numberOr(template?.salary, DEFAULT_SALARY),
     deductions: numberOr(template?.deductions, DEFAULT_DEDUCTIONS),
@@ -21,11 +21,15 @@ export function createMonth(monthKey = getMonthKey(new Date()), template?: Month
     totalSpent: 0,
     savingsThisMonth: 0,
     expenses: [],
-    investment: numberOr(template?.investment, 0),
-    emergencyFund: numberOr(template?.emergencyFund, 0),
-    outings: numberOr(template?.outings, 0),
+    investment: 0,
+    emergencyFund: 0,
+    outings: 0,
+    reserveAllocationMode: "auto",
     surplusTransferred: 0,
   };
+
+  const allocation = getAutomaticReserveAllocation(month);
+  return { ...month, ...allocation };
 }
 
 export function createInitialState(): BudgetState {
@@ -75,8 +79,16 @@ function normalizeMonth(monthKey: string, value: unknown, fallback?: MonthData):
   const normalizedCategories = categories.length ? categories : copyCategories(fallback?.categories ?? DEFAULT_CATEGORIES);
   const totalSpent = Math.max(0, numberOr(candidate.totalSpent, expenses.reduce((total, expense) => total + expense.amount, 0)));
   const rawCategories = Array.isArray(candidate.categories) ? candidate.categories : [];
+  const investment = numberOr(candidate.investment, fallback?.investment ?? 0);
+  const emergencyFund = numberOr(candidate.emergencyFund, fallback?.emergencyFund ?? 0);
+  const outings = numberOr(candidate.outings, fallback?.outings ?? 0);
+  const hasSavedMode = candidate.reserveAllocationMode === "auto" || candidate.reserveAllocationMode === "manual";
+  const reserveAllocationMode: ReserveAllocationMode = candidate.reserveAllocationMode === "manual"
+    || (!hasSavedMode && investment + emergencyFund + outings > 0)
+    ? "manual"
+    : "auto";
 
-  return {
+  const month: MonthData = {
     monthKey,
     salary: numberOr(candidate.salary, fallback?.salary ?? DEFAULT_SALARY),
     deductions: numberOr(candidate.deductions, fallback?.deductions ?? DEFAULT_DEDUCTIONS),
@@ -87,11 +99,16 @@ function normalizeMonth(monthKey: string, value: unknown, fallback?: MonthData):
     totalSpent,
     savingsThisMonth: Math.max(0, numberOr(candidate.savingsThisMonth, fallback?.savingsThisMonth ?? 0)),
     expenses,
-    investment: numberOr(candidate.investment, fallback?.investment ?? 0),
-    emergencyFund: numberOr(candidate.emergencyFund, fallback?.emergencyFund ?? 0),
-    outings: numberOr(candidate.outings, fallback?.outings ?? 0),
+    investment,
+    emergencyFund,
+    outings,
+    reserveAllocationMode,
     surplusTransferred: Math.max(0, numberOr(candidate.surplusTransferred, fallback?.surplusTransferred ?? 0)),
   };
+
+  return month.reserveAllocationMode === "auto"
+    ? { ...month, ...getAutomaticReserveAllocation(month) }
+    : month;
 }
 
 export function normalizeState(value: unknown): BudgetState {

@@ -1,3 +1,5 @@
+import { DEFAULT_RESERVE_ALLOCATION, MIN_INVESTMENT_ALLOCATION } from "@/lib/constants";
+
 export function formatMoney(value: number, currency = "د.ك") {
   const safeValue = Math.abs(value) < 0.0005 ? 0 : value;
   const hasDecimals = Math.abs(safeValue % 1) > 0.0005;
@@ -76,6 +78,62 @@ export function getUnusedBudgetSurplus(month: {
     totalUnused,
     transferred,
     available: Math.max(0, totalUnused - transferred),
+  };
+}
+
+function roundMoney(value: number) {
+  return Math.round(Math.max(0, value) * 1000) / 1000;
+}
+
+export function getReserveAllocationForAmount(amount: number) {
+  const available = roundMoney(amount);
+  if (available <= 0) {
+    return { investment: 0, emergencyFund: 0, outings: 0 };
+  }
+
+  const fullPlanTotal = DEFAULT_RESERVE_ALLOCATION.emergencyFund
+    + DEFAULT_RESERVE_ALLOCATION.investment
+    + DEFAULT_RESERVE_ALLOCATION.outings;
+
+  if (available >= fullPlanTotal) {
+    const investment = roundMoney(available * DEFAULT_RESERVE_ALLOCATION.investment / fullPlanTotal);
+    const emergencyFund = roundMoney(available * DEFAULT_RESERVE_ALLOCATION.emergencyFund / fullPlanTotal);
+    return {
+      investment,
+      emergencyFund,
+      outings: roundMoney(available - investment - emergencyFund),
+    };
+  }
+
+  if (available < MIN_INVESTMENT_ALLOCATION) {
+    return { investment: available, emergencyFund: 0, outings: 0 };
+  }
+
+  const remainingAfterInvestment = available - MIN_INVESTMENT_ALLOCATION;
+  const flexiblePlanTotal = DEFAULT_RESERVE_ALLOCATION.emergencyFund + DEFAULT_RESERVE_ALLOCATION.outings;
+  const emergencyFund = roundMoney(remainingAfterInvestment * DEFAULT_RESERVE_ALLOCATION.emergencyFund / flexiblePlanTotal);
+
+  return {
+    investment: MIN_INVESTMENT_ALLOCATION,
+    emergencyFund,
+    outings: roundMoney(remainingAfterInvestment - emergencyFund),
+  };
+}
+
+export function getAutomaticReserveAllocation(month: {
+  salary: number;
+  deductions: number;
+  categories: { budget: number }[];
+  savingsThisMonth?: number;
+}) {
+  const netSalary = month.salary - month.deductions;
+  const fixedAllocations = month.categories.reduce((total, category) => total + Math.max(0, category.budget), 0);
+  const savingsThisMonth = Math.max(0, month.savingsThisMonth ?? 0);
+  const available = Math.max(0, netSalary - fixedAllocations - savingsThisMonth);
+
+  return {
+    ...getReserveAllocationForAmount(available),
+    available: roundMoney(available),
   };
 }
 

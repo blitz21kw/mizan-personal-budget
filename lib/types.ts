@@ -23,6 +23,8 @@ export type Expense = {
   createdAt: string;
 };
 
+export type ReserveAllocationMode = "auto" | "manual";
+
 export type MonthData = {
   monthKey: string;
   salary: number;
@@ -34,6 +36,7 @@ export type MonthData = {
   investment: number;
   emergencyFund: number;
   outings: number;
+  reserveAllocationMode: ReserveAllocationMode;
   surplusTransferred: number;
 };
 
@@ -60,4 +63,5 @@ export type MonthSettings = Pick<
   | "investment"
   | "emergencyFund"
   | "outings"
+  | "reserveAllocationMode"
 >;

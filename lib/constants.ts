@@ -5,6 +5,14 @@ export const STORAGE_KEY = "mizan-personal-budget-v1";
 export const DEFAULT_SALARY = 1565;
 export const DEFAULT_DEDUCTIONS = 250;
 
+export const DEFAULT_RESERVE_ALLOCATION = {
+  emergencyFund: 150,
+  investment: 100,
+  outings: 65,
+} as const;
+
+export const MIN_INVESTMENT_ALLOCATION = 100;
+
 export const CATEGORY_COLORS = [
   "#6f7df5",
   "#ee9b4d",

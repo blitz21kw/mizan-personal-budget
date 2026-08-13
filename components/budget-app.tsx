@@ -9,7 +9,7 @@ import { DesktopSidebar, MobileBottomNav } from "@/components/navigation";
 import SettingsView from "@/components/settings-view";
 import TransactionsView from "@/components/transactions-view";
 import { createInitialState, createMonth, loadState, saveState } from "@/lib/storage";
-import { formatMoney, getMonthKey, getUnusedBudgetSurplus } from "@/lib/format";
+import { formatMoney, getAutomaticReserveAllocation, getMonthKey, getUnusedBudgetSurplus } from "@/lib/format";
 import type { AppView, BudgetState, Expense, ExpenseDraft, MonthData, MonthSettings } from "@/lib/types";
 
 export default function BudgetApp() {
@@ -161,7 +161,11 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
-      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: { ...month, ...settings } } };
+      const nextMonth = { ...month, ...settings };
+      const savedMonth = nextMonth.reserveAllocationMode === "auto"
+        ? { ...nextMonth, ...getAutomaticReserveAllocation(nextMonth) }
+        : nextMonth;
+      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: savedMonth } };
     });
     notify("تم حفظ إعدادات هذا الشهر.");
   }, [notify]);
@@ -170,13 +174,17 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
+      const nextMonth = {
+        ...month,
+        categories: month.categories.map((category) => category.id === categoryId ? { ...category, budget } : category),
+      };
       return {
         ...previous,
         months: {
           ...previous.months,
           [previous.activeMonthKey]: {
-            ...month,
-            categories: month.categories.map((category) => category.id === categoryId ? { ...category, budget } : category),
+            ...nextMonth,
+            ...(nextMonth.reserveAllocationMode === "auto" ? getAutomaticReserveAllocation(nextMonth) : {}),
           },
         },
       };
@@ -187,7 +195,17 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
-      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: { ...month, [field]: amount } } };
+      const nextMonth = { ...month, [field]: amount };
+      return {
+        ...previous,
+        months: {
+          ...previous.months,
+          [previous.activeMonthKey]: {
+            ...nextMonth,
+            ...(nextMonth.reserveAllocationMode === "auto" ? getAutomaticReserveAllocation(nextMonth) : {}),
+          },
+        },
+      };
     });
   }, []);
 
@@ -195,7 +213,13 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
-      return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: { ...month, [field]: amount } } };
+      return {
+        ...previous,
+        months: {
+          ...previous.months,
+          [previous.activeMonthKey]: { ...month, [field]: amount, reserveAllocationMode: "manual" },
+        },
+      };
     });
   }, []);
 
@@ -241,6 +265,7 @@ export default function BudgetApp() {
             ...month,
             investment: month.investment + investmentAmount,
             emergencyFund: month.emergencyFund + emergencyAmount,
+            reserveAllocationMode: "manual",
             surplusTransferred: (month.surplusTransferred ?? 0) + transferredAmount,
           },
         },
