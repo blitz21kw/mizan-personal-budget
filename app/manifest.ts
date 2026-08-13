@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+export const dynamic = "force-static";
+
 export default function manifest(): MetadataRoute.Manifest {
   const basePath = process.env.GITHUB_PAGES === "true"
     ? `/${process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "mizan-personal-budget"}`
