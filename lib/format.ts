@@ -1,4 +1,4 @@
-import { DEFAULT_RESERVE_ALLOCATION } from "@/lib/constants";
+import { DEFAULT_RESERVE_ALLOCATION, MAX_OUTINGS_ALLOCATION } from "@/lib/constants";
 
 export function formatMoney(value: number, currency = "د.ك") {
   const safeValue = Math.abs(value) < 0.0005 ? 0 : value;
@@ -85,31 +85,17 @@ function wholeDinars(value: number) {
   return Math.max(0, Math.floor(value));
 }
 
-export function getReserveAllocationForAmount(amount: number) {
+function distributeWholeDinars(amount: number, weights: Record<string, number>) {
   const available = wholeDinars(amount);
-  if (available <= 0) {
-    return { investment: 0, emergencyFund: 0, outings: 0 };
-  }
+  const fields = Object.keys(weights);
+  const totalWeight = fields.reduce((total, field) => total + weights[field], 0);
+  const raw = Object.fromEntries(fields.map((field) => [field, available * weights[field] / totalWeight])) as Record<string, number>;
+  const allocation = Object.fromEntries(fields.map((field) => [field, Math.floor(raw[field])])) as Record<string, number>;
+  let remainingDinars = available - fields.reduce((total, field) => total + allocation[field], 0);
 
-  const fullPlanTotal = DEFAULT_RESERVE_ALLOCATION.emergencyFund
-    + DEFAULT_RESERVE_ALLOCATION.investment
-    + DEFAULT_RESERVE_ALLOCATION.outings;
-
-  const raw = {
-    investment: available * DEFAULT_RESERVE_ALLOCATION.investment / fullPlanTotal,
-    emergencyFund: available * DEFAULT_RESERVE_ALLOCATION.emergencyFund / fullPlanTotal,
-    outings: available * DEFAULT_RESERVE_ALLOCATION.outings / fullPlanTotal,
-  };
-  const allocation = {
-    investment: Math.floor(raw.investment),
-    emergencyFund: Math.floor(raw.emergencyFund),
-    outings: Math.floor(raw.outings),
-  };
-  let remainingDinars = available - allocation.investment - allocation.emergencyFund - allocation.outings;
-
-  const remainderOrder = (Object.keys(raw) as (keyof typeof raw)[]).sort((left, right) => {
+  const remainderOrder = [...fields].sort((left, right) => {
     const difference = (raw[right] - Math.floor(raw[right])) - (raw[left] - Math.floor(raw[left]));
-    return difference || (left === "investment" ? -1 : right === "investment" ? 1 : left === "emergencyFund" ? -1 : 1);
+    return difference || fields.indexOf(left) - fields.indexOf(right);
   });
 
   for (const field of remainderOrder) {
@@ -119,6 +105,38 @@ export function getReserveAllocationForAmount(amount: number) {
   }
 
   return allocation;
+}
+
+export function getReserveAllocationForAmount(amount: number) {
+  const available = wholeDinars(amount);
+  if (available <= 0) {
+    return { investment: 0, emergencyFund: 0, outings: 0 };
+  }
+
+  const fullPlanTotal = DEFAULT_RESERVE_ALLOCATION.emergencyFund
+    + DEFAULT_RESERVE_ALLOCATION.investment
+    + DEFAULT_RESERVE_ALLOCATION.outings;
+  const rawOutings = available * DEFAULT_RESERVE_ALLOCATION.outings / fullPlanTotal;
+
+  if (rawOutings > MAX_OUTINGS_ALLOCATION) {
+    const coreAllocation = distributeWholeDinars(available - MAX_OUTINGS_ALLOCATION, {
+      emergencyFund: DEFAULT_RESERVE_ALLOCATION.emergencyFund,
+      investment: DEFAULT_RESERVE_ALLOCATION.investment,
+    });
+
+    return {
+      investment: coreAllocation.investment,
+      emergencyFund: coreAllocation.emergencyFund,
+      outings: MAX_OUTINGS_ALLOCATION,
+    };
+  }
+
+  const allocation = distributeWholeDinars(available, DEFAULT_RESERVE_ALLOCATION);
+  return {
+    investment: allocation.investment,
+    emergencyFund: allocation.emergencyFund,
+    outings: allocation.outings,
+  };
 }
 
 export function getAutomaticReserveAllocation(month: {
