@@ -162,8 +162,15 @@ export default function BudgetApp() {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
       const nextMonth = { ...month, ...settings };
-      const savedMonth = nextMonth.reserveAllocationMode === "auto"
-        ? { ...nextMonth, ...getAutomaticReserveAllocation(nextMonth) }
+      const budgetsChanged = settings.categories.length !== month.categories.length
+        || settings.categories.some((category) => month.categories.find((item) => item.id === category.id)?.budget !== category.budget);
+      const coreValuesChanged = settings.salary !== month.salary
+        || settings.deductions !== month.deductions
+        || settings.savingsThisMonth !== month.savingsThisMonth
+        || budgetsChanged;
+      const shouldRecalculate = coreValuesChanged || nextMonth.reserveAllocationMode === "auto";
+      const savedMonth = shouldRecalculate
+        ? { ...nextMonth, ...getAutomaticReserveAllocation(nextMonth), reserveAllocationMode: "auto" as const }
         : nextMonth;
       return { ...previous, months: { ...previous.months, [previous.activeMonthKey]: savedMonth } };
     });
@@ -184,7 +191,8 @@ export default function BudgetApp() {
           ...previous.months,
           [previous.activeMonthKey]: {
             ...nextMonth,
-            ...(nextMonth.reserveAllocationMode === "auto" ? getAutomaticReserveAllocation(nextMonth) : {}),
+            ...getAutomaticReserveAllocation(nextMonth),
+            reserveAllocationMode: "auto",
           },
         },
       };
@@ -202,7 +210,8 @@ export default function BudgetApp() {
           ...previous.months,
           [previous.activeMonthKey]: {
             ...nextMonth,
-            ...(nextMonth.reserveAllocationMode === "auto" ? getAutomaticReserveAllocation(nextMonth) : {}),
+            ...getAutomaticReserveAllocation(nextMonth),
+            reserveAllocationMode: "auto",
           },
         },
       };
