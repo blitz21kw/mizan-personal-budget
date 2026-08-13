@@ -223,7 +223,7 @@ export default function BudgetApp() {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
       const nextMonth = { ...month, [field]: amount };
-      const shouldRecalculate = field !== "totalSpent";
+      const shouldRecalculate = field === "salary" || field === "deductions" || field === "savingsThisMonth";
       return {
         ...previous,
         months: {
