@@ -1,4 +1,4 @@
-import { DEFAULT_RESERVE_ALLOCATION, MIN_INVESTMENT_ALLOCATION } from "@/lib/constants";
+import { DEFAULT_RESERVE_ALLOCATION } from "@/lib/constants";
 
 export function formatMoney(value: number, currency = "د.ك") {
   const safeValue = Math.abs(value) < 0.0005 ? 0 : value;
@@ -81,12 +81,12 @@ export function getUnusedBudgetSurplus(month: {
   };
 }
 
-function roundMoney(value: number) {
-  return Math.round(Math.max(0, value) * 1000) / 1000;
+function wholeDinars(value: number) {
+  return Math.max(0, Math.floor(value));
 }
 
 export function getReserveAllocationForAmount(amount: number) {
-  const available = roundMoney(amount);
+  const available = wholeDinars(amount);
   if (available <= 0) {
     return { investment: 0, emergencyFund: 0, outings: 0 };
   }
@@ -95,29 +95,30 @@ export function getReserveAllocationForAmount(amount: number) {
     + DEFAULT_RESERVE_ALLOCATION.investment
     + DEFAULT_RESERVE_ALLOCATION.outings;
 
-  if (available >= fullPlanTotal) {
-    const investment = roundMoney(available * DEFAULT_RESERVE_ALLOCATION.investment / fullPlanTotal);
-    const emergencyFund = roundMoney(available * DEFAULT_RESERVE_ALLOCATION.emergencyFund / fullPlanTotal);
-    return {
-      investment,
-      emergencyFund,
-      outings: roundMoney(available - investment - emergencyFund),
-    };
-  }
-
-  if (available < MIN_INVESTMENT_ALLOCATION) {
-    return { investment: available, emergencyFund: 0, outings: 0 };
-  }
-
-  const remainingAfterInvestment = available - MIN_INVESTMENT_ALLOCATION;
-  const flexiblePlanTotal = DEFAULT_RESERVE_ALLOCATION.emergencyFund + DEFAULT_RESERVE_ALLOCATION.outings;
-  const emergencyFund = roundMoney(remainingAfterInvestment * DEFAULT_RESERVE_ALLOCATION.emergencyFund / flexiblePlanTotal);
-
-  return {
-    investment: MIN_INVESTMENT_ALLOCATION,
-    emergencyFund,
-    outings: roundMoney(remainingAfterInvestment - emergencyFund),
+  const raw = {
+    investment: available * DEFAULT_RESERVE_ALLOCATION.investment / fullPlanTotal,
+    emergencyFund: available * DEFAULT_RESERVE_ALLOCATION.emergencyFund / fullPlanTotal,
+    outings: available * DEFAULT_RESERVE_ALLOCATION.outings / fullPlanTotal,
   };
+  const allocation = {
+    investment: Math.floor(raw.investment),
+    emergencyFund: Math.floor(raw.emergencyFund),
+    outings: Math.floor(raw.outings),
+  };
+  let remainingDinars = available - allocation.investment - allocation.emergencyFund - allocation.outings;
+
+  const remainderOrder = (Object.keys(raw) as (keyof typeof raw)[]).sort((left, right) => {
+    const difference = (raw[right] - Math.floor(raw[right])) - (raw[left] - Math.floor(raw[left]));
+    return difference || (left === "investment" ? -1 : right === "investment" ? 1 : left === "emergencyFund" ? -1 : 1);
+  });
+
+  for (const field of remainderOrder) {
+    if (remainingDinars <= 0) break;
+    allocation[field] += 1;
+    remainingDinars -= 1;
+  }
+
+  return allocation;
 }
 
 export function getAutomaticReserveAllocation(month: {
@@ -133,7 +134,7 @@ export function getAutomaticReserveAllocation(month: {
 
   return {
     ...getReserveAllocationForAmount(available),
-    available: roundMoney(available),
+    available: wholeDinars(available),
   };
 }
 

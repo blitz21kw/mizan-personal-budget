@@ -148,7 +148,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
           <MoneyInput label="صندوق الطوارئ" value={emergencyFund} onChange={(value) => { setReserveAllocationMode("manual"); setEmergencyFund(value); }} icon={ShieldCheck} />
           <MoneyInput label="طلعات ومطاعم" value={outings} onChange={(value) => { setReserveAllocationMode("manual"); setOutings(value); }} icon={CirclePlus} />
         </div>
-        <p className="mt-4 text-[11px] font-semibold leading-5 text-[#87948b]">المتاح {formatMoney(automaticAllocation.available)} يتوزع تلقائياً بنسبة 150 / 100 / 65، والاستثمار لا يقل عن 100 د.ك إذا كان المبلغ يسمح.</p>
+        <p className="mt-4 text-[11px] font-semibold leading-5 text-[#87948b]">المتاح {formatMoney(automaticAllocation.available)} يتوزع تلقائياً حسب نسبة 150 / 100 / 65، وبأرقام صحيحة مجموعها يساوي المبلغ المتاح.</p>
       </section>
 
       <section className="settings-card surface-card rounded-[28px] p-5 sm:p-6">

@@ -11,8 +11,6 @@ export const DEFAULT_RESERVE_ALLOCATION = {
   outings: 65,
 } as const;
 
-export const MIN_INVESTMENT_ALLOCATION = 100;
-
 export const CATEGORY_COLORS = [
   "#6f7df5",
   "#ee9b4d",

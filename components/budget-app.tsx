@@ -222,11 +222,15 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
+      const nextMonth = { ...month, [field]: amount };
+      const shouldRecalculate = field !== "totalSpent";
       return {
         ...previous,
         months: {
           ...previous.months,
-          [previous.activeMonthKey]: { ...month, [field]: amount, reserveAllocationMode: "manual" },
+          [previous.activeMonthKey]: shouldRecalculate
+            ? { ...nextMonth, ...getAutomaticReserveAllocation(nextMonth), reserveAllocationMode: "auto" }
+            : { ...nextMonth, reserveAllocationMode: "manual" },
         },
       };
     });
