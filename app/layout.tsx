@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./mobile-polish.css";
 
 const publicAssetPath = process.env.GITHUB_PAGES === "true"
   ? `/${process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "mizan-personal-budget"}`

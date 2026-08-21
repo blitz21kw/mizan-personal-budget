@@ -1,0 +1,572 @@
+/*
+ * iPhone visual polish.
+ * This file is intentionally isolated and imported after globals.css so the
+ * complete mobile upgrade can be rolled back by removing one import.
+ */
+
+.number-ltr {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.mobile-sheet-backdrop {
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 639px) {
+  :root {
+    --mobile-edge: 0.875rem;
+    --mobile-radius: 1.375rem;
+    --mobile-shadow: 0 8px 24px rgba(27, 73, 51, 0.065);
+    --mobile-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html {
+    scroll-padding-bottom: calc(6.25rem + env(safe-area-inset-bottom));
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 6% -2%, rgba(196, 232, 211, 0.44), transparent 22rem),
+      linear-gradient(180deg, #f8faf8 0%, #f3f7f4 100%);
+  }
+
+  .app-main-shell {
+    padding-inline: var(--mobile-edge);
+    padding-top: max(0.625rem, env(safe-area-inset-top));
+  }
+
+  .app-content {
+    max-width: 32rem;
+  }
+
+  .app-topbar {
+    position: sticky;
+    top: env(safe-area-inset-top);
+    z-index: 30;
+    min-height: 2.75rem;
+    margin-inline: calc(var(--mobile-edge) * -1);
+    margin-bottom: 0.625rem;
+    padding-inline: var(--mobile-edge);
+    border-bottom: 1px solid rgba(220, 231, 223, 0.72);
+    background: rgba(248, 250, 248, 0.88);
+    box-shadow: 0 8px 22px rgba(27, 73, 51, 0.035);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+
+  .dashboard-view > * + *,
+  .settings-view > * + *,
+  .history-view > * + *,
+  .transactions-view > * + * {
+    margin-block-start: 1rem !important;
+  }
+
+  .expense-page > * + * {
+    margin-block-start: 0.875rem !important;
+  }
+
+  .surface-card {
+    border-color: rgba(221, 231, 223, 0.96);
+    box-shadow: var(--mobile-shadow);
+  }
+
+  /* Dashboard: put the useful numbers inside the first viewport. */
+  .dashboard-heading-copy {
+    display: none;
+  }
+
+  .dashboard-header {
+    gap: 0;
+  }
+
+  .month-control {
+    width: 100%;
+    min-width: 0;
+    min-height: 3rem;
+    border-radius: 1rem;
+    padding-inline: 0.875rem;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 5px 18px rgba(31, 82, 57, 0.045);
+  }
+
+  .dashboard-hero {
+    border-radius: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 18px 42px rgba(19, 61, 42, 0.19);
+  }
+
+  .dashboard-hero > .relative {
+    gap: 1rem;
+  }
+
+  .dashboard-hero > .relative > div:first-child > .number-ltr {
+    margin-top: 1rem;
+    font-size: 2.85rem;
+    letter-spacing: -0.065em;
+  }
+
+  .dashboard-hero > .relative > div:first-child > p:last-child {
+    margin-top: 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .dashboard-hero .hero-action {
+    width: 100%;
+    min-height: 3.125rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.13);
+  }
+
+  .dashboard-hero .hero-action > span {
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 0.65rem;
+  }
+
+  .dashboard-hero .hero-metrics {
+    margin-top: 1rem;
+    gap: 0.75rem;
+    padding-top: 0.875rem;
+  }
+
+  .dashboard-stat-grid {
+    gap: 0.625rem;
+  }
+
+  .dashboard-stat-grid > .surface-card {
+    min-height: 6.75rem;
+    border-radius: 1.25rem;
+    padding: 0.75rem;
+  }
+
+  .dashboard-stat-grid > .surface-card > div:first-child {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.7rem;
+  }
+
+  .dashboard-stat-grid > .surface-card > p,
+  .dashboard-stat-grid > .surface-card > div + p {
+    margin-top: 0.5rem;
+  }
+
+  .dashboard-stat-grid > .surface-card > p:last-child {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .dashboard-stat-grid .money-edit-input {
+    width: 4.25rem;
+    min-height: 2rem;
+    padding-inline: 0.25rem;
+  }
+
+  .plan-card,
+  .surplus-card,
+  .savings-card,
+  .settings-card,
+  .history-detail-card,
+  .transactions-filter-card,
+  .transactions-list-card {
+    border-radius: var(--mobile-radius);
+  }
+
+  .plan-card,
+  .surplus-card,
+  .savings-card,
+  .settings-card,
+  .history-detail-card,
+  .transactions-filter-card {
+    padding: 1rem;
+  }
+
+  .plan-card h2,
+  .budget-section-heading h2,
+  .savings-card h2,
+  .history-detail-card h2 {
+    font-size: 1.125rem;
+  }
+
+  .plan-card > div:nth-child(2) {
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+
+  .plan-card > div:nth-child(2) > div:first-child > div:first-child {
+    align-items: center;
+  }
+
+  .surplus-card > div:first-child {
+    gap: 0.875rem;
+  }
+
+  .surplus-card > div:first-child > div:last-child {
+    padding: 0.75rem;
+  }
+
+  .surplus-card button {
+    min-height: 2.75rem;
+  }
+
+  .budget-section-heading {
+    margin-bottom: 0.75rem;
+  }
+
+  .budget-category-card {
+    min-height: 0;
+    border-radius: 1.25rem;
+    padding: 0.875rem;
+  }
+
+  .budget-category-card > div:first-child > div:first-child > span:first-child {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.875rem;
+  }
+
+  .budget-category-card > div:nth-child(2) {
+    margin-top: 0.875rem;
+  }
+
+  .budget-category-card > div:nth-child(3) {
+    margin-top: 0.625rem;
+    height: 0.5rem;
+  }
+
+  .budget-category-card > div:nth-child(4) {
+    margin-top: 0.375rem;
+  }
+
+  .money-edit-input {
+    min-height: 2.75rem;
+    border-radius: 0.75rem;
+  }
+
+  .reserve-grid {
+    gap: 0.625rem;
+  }
+
+  .reserve-card {
+    min-height: 4.5rem;
+    border-radius: 1.25rem;
+    padding: 0.875rem;
+  }
+
+  .reserve-card > span:first-child,
+  .reserve-card > div:first-child > div:first-child > span:first-child {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.875rem;
+  }
+
+  .dashboard-footnote {
+    padding-block: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+
+  /* Expense entry: one-handed, fast, and keyboard safe. */
+  .expense-page-header {
+    gap: 0.75rem;
+  }
+
+  .expense-page-header h1 {
+    margin-top: 0.25rem;
+    font-size: 1.5rem;
+  }
+
+  .expense-page-header > div > p:first-child {
+    display: none;
+  }
+
+  .expense-page-header > div > p:last-child {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  .expense-form > * + * {
+    margin-block-start: 0.875rem !important;
+  }
+
+  .expense-amount-card,
+  .expense-form > .surface-card {
+    border-radius: var(--mobile-radius);
+  }
+
+  .expense-amount-card > div:first-child,
+  .expense-amount-card > div:last-child,
+  .expense-form > .surface-card {
+    padding-inline: 1rem;
+  }
+
+  .expense-amount-card > div:first-child {
+    padding-top: 1rem;
+    padding-bottom: 0.875rem;
+  }
+
+  .expense-amount-card > div:last-child {
+    padding-block: 1rem;
+  }
+
+  .expense-amount-input {
+    font-size: 3.25rem !important;
+  }
+
+  .expense-amount-card button {
+    min-height: 2.75rem;
+  }
+
+  .expense-category-button {
+    min-height: 3.25rem;
+    border-radius: 1rem;
+  }
+
+  .expense-actions {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    margin-inline: -0.25rem;
+    padding: 0.75rem 0.25rem;
+    background: linear-gradient(to bottom, rgba(243, 247, 244, 0), rgba(243, 247, 244, 0.97) 32%);
+  }
+
+  .expense-actions button[type="submit"] {
+    min-height: 3.25rem;
+    border-radius: 1rem;
+  }
+
+  /* Settings: denser cards with full-size touch inputs. */
+  .settings-header > p:first-child {
+    display: none;
+  }
+
+  .settings-header h1 {
+    font-size: 1.55rem;
+  }
+
+  .settings-header h1 + p {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .settings-header button,
+  .settings-footer button {
+    min-height: 3.125rem;
+    border-radius: 1rem;
+  }
+
+  .settings-card > .mt-6 {
+    margin-top: 1rem;
+  }
+
+  .settings-card input {
+    min-height: 3rem;
+  }
+
+  .settings-footer {
+    border-radius: 1.25rem;
+  }
+
+  /* History and transactions: prevent narrow-screen squeezing. */
+  .history-view > header,
+  .transactions-view > header {
+    gap: 0.75rem;
+  }
+
+  .history-view > header h1,
+  .transactions-view > header h1 {
+    font-size: 1.55rem;
+  }
+
+  .history-view > header h1 + p,
+  .transactions-view > header h1 + p {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .history-view > header > div:first-child > p:first-child,
+  .transactions-view > header > div:first-child > p:first-child {
+    display: none;
+  }
+
+  .history-create-month {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+  }
+
+  .history-create-month input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .history-create-month button,
+  .history-month-tabs button {
+    min-height: 2.75rem;
+  }
+
+  .history-month-tabs {
+    scroll-snap-type: inline proximity;
+  }
+
+  .history-month-tabs > button {
+    scroll-snap-align: start;
+  }
+
+  .history-summary {
+    border-radius: 1.5rem;
+    padding: 1rem;
+  }
+
+  .history-summary > .relative {
+    gap: 1rem;
+  }
+
+  .history-summary > .relative > div:first-child > .number-ltr {
+    margin-top: 0.75rem;
+    font-size: 2.25rem;
+  }
+
+  .history-stat-grid {
+    gap: 0.625rem;
+  }
+
+  .history-stat-grid > .surface-card {
+    min-height: 6.25rem;
+    border-radius: 1.125rem;
+    padding: 0.75rem;
+  }
+
+  .history-stat-grid > .surface-card p {
+    margin-top: 0.5rem;
+  }
+
+  .transactions-filter-card {
+    padding: 0.875rem;
+  }
+
+  .transactions-filter-card button {
+    min-height: 2.75rem;
+  }
+
+  .transactions-list-card {
+    border-radius: var(--mobile-radius);
+  }
+
+  .transaction-row {
+    gap: 0.75rem;
+    padding: 0.875rem;
+  }
+
+  .transaction-row > span:first-child {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.875rem;
+  }
+
+  .transaction-row button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  /* iOS bottom navigation and sheets. */
+  .mobile-bottom-nav {
+    padding-inline: 0.5rem;
+    padding-top: 0.45rem;
+    border-color: rgba(214, 228, 218, 0.94);
+    background: rgba(252, 253, 252, 0.94);
+    box-shadow: 0 -12px 30px rgba(24, 65, 46, 0.085);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+  }
+
+  .mobile-bottom-nav > div {
+    gap: 0.125rem;
+  }
+
+  .mobile-nav-button {
+    min-height: 3.5rem;
+    border-radius: 1rem;
+  }
+
+  .mobile-nav-button[aria-current="page"] {
+    background: #eaf7ee;
+    box-shadow: inset 0 0 0 1px rgba(127, 190, 149, 0.14);
+  }
+
+  .mobile-nav-cta {
+    margin-top: -1.55rem;
+  }
+
+  .mobile-nav-cta > span {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-width: 4px;
+    border-radius: 1.15rem;
+  }
+
+  .safe-bottom-space {
+    height: calc(5.9rem + env(safe-area-inset-bottom));
+  }
+
+  .mobile-sheet-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .mobile-sheet {
+    max-height: calc(100dvh - max(0.75rem, env(safe-area-inset-top)));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(220, 231, 223, 0.92);
+    border-bottom: 0;
+    border-radius: 1.75rem 1.75rem 0 0;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 374px) {
+  :root {
+    --mobile-edge: 0.75rem;
+  }
+
+  .dashboard-hero > .relative > div:first-child > .number-ltr {
+    font-size: 2.5rem;
+  }
+
+  .dashboard-stat-grid > .surface-card {
+    padding: 0.675rem;
+  }
+
+  .history-create-month {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-row {
+    gap: 0.5rem;
+    padding-inline: 0.75rem;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .surface-card:hover,
+  .budget-category-card:hover {
+    transform: none;
+  }
+
+  button:active {
+    transform: scale(0.97);
+    transition-duration: 80ms;
+  }
+
+  .mobile-nav-button:active,
+  .mobile-nav-cta:active {
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active,
+  .mobile-nav-button:active,
+  .mobile-nav-cta:active {
+    transform: none;
+  }
+}

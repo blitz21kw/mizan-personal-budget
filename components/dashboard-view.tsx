@@ -88,7 +88,7 @@ export default function DashboardView({
   return (
     <div className="dashboard-view space-y-6 pb-2">
       <header className="dashboard-header flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+        <div className="dashboard-heading-copy">
           <p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">لوحة التحكم</p>
           <h1 className="mt-2 text-[clamp(1.75rem,5vw,2.65rem)] font-black leading-[1.12] tracking-[-0.06em] text-[#19382c]">
             أموالك، بصورة أهدأ.
@@ -178,7 +178,7 @@ export default function DashboardView({
         </div>
       </section>
 
-      <section className="surface-card overflow-hidden rounded-[28px] border-[#cfe5d6] bg-[linear-gradient(135deg,#f7fcf8,#eef8f1)] p-5 sm:p-6">
+      <section className="surplus-card surface-card overflow-hidden rounded-[28px] border-[#cfe5d6] bg-[linear-gradient(135deg,#f7fcf8,#eef8f1)] p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#dff3e7] text-[#2d9b73]"><Sparkles className="size-[19px]" /></span>
@@ -200,7 +200,7 @@ export default function DashboardView({
       </section>
 
       <section>
-        <div className="mb-4 flex items-end justify-between gap-3">
+        <div className="budget-section-heading mb-4 flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-extrabold tracking-[0.12em] text-[#9aa59f]">تفاصيل الشهر</p>
             <h2 className="mt-1.5 text-xl font-black tracking-[-0.04em] text-[#19382c]">ميزانياتك</h2>
@@ -227,13 +227,13 @@ export default function DashboardView({
         )}
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="reserve-grid grid gap-3 sm:grid-cols-3">
         <ReserveCard label="استثمار" value={month.investment} helper="تخصيص شهري" icon={TrendingUp} tone="mint" onChange={(amount) => onUpdateReserve("investment", amount)} />
         <ReserveCard label="صندوق الطوارئ" value={month.emergencyFund} helper="أمان أكثر" icon={ShieldCheck} tone="peach" onChange={(amount) => onUpdateReserve("emergencyFund", amount)} />
         <OutingsCard allocated={month.outings} spent={month.outingsSpent} onAllocatedChange={(amount) => onUpdateReserve("outings", amount)} onSpentChange={onUpdateOutingsSpent} />
       </section>
 
-      <section className="surface-card rounded-[28px] p-5 sm:p-6">
+      <section className="savings-card surface-card rounded-[28px] p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-extrabold tracking-[0.12em] text-[#9aa59f]">الادخار الفعلي</p>
@@ -247,12 +247,12 @@ export default function DashboardView({
         </div>
       </section>
 
-      <p className="text-center text-xs font-semibold text-[#a1aca5]">{monthLabel} · آخر تحديث محفوظ على جهازك</p>
+      <p className="dashboard-footnote text-center text-xs font-semibold text-[#a1aca5]">{monthLabel} · آخر تحديث محفوظ على جهازك</p>
       <button type="button" onClick={onOpenHistory} className="sr-only">فتح السجل الشهري</button>
 
       {isSurplusDialogOpen && (
-        <div className="fixed inset-0 z-[55] flex items-end justify-center bg-[#10251d]/50 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-label="تحويل فائض الميزانية">
-          <div className="w-full max-w-lg rounded-t-[30px] bg-[#f5f8f6] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:rounded-[30px] sm:p-6">
+        <div className="mobile-sheet-backdrop fixed inset-0 z-[55] flex items-end justify-center bg-[#10251d]/50 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-label="تحويل فائض الميزانية">
+          <div className="mobile-sheet w-full max-w-lg rounded-t-[30px] bg-[#f5f8f6] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:rounded-[30px] sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div><p className="text-xs font-extrabold tracking-[0.14em] text-[#2d9b73]">تحويل الفائض</p><h2 className="mt-1 text-xl font-black tracking-[-0.04em] text-[#19382c]">وين تبي تحط المبلغ؟</h2><p className="mt-1.5 text-xs font-semibold leading-6 text-[#84948a]">اختر النسبة لكل جهة. أي نسبة متبقية تبقى خارج التحويل.</p></div>
               <button type="button" onClick={() => setIsSurplusDialogOpen(false)} className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#e1ebe3] bg-white text-[#83958a]" aria-label="إغلاق"><X className="size-4" /></button>
@@ -288,7 +288,7 @@ export default function DashboardView({
 
 function MonthSelect({ monthKey, onChange }: { monthKey: string; onChange: (key: string) => void }) {
   return (
-    <label className="group relative flex min-h-12 items-center gap-2 rounded-2xl border border-[#e1e9e3] bg-white/80 px-3.5 shadow-sm transition focus-within:border-[#92d4ad] focus-within:ring-4 focus-within:ring-[#c9eed7]/60 sm:min-w-48">
+    <label className="month-control group relative flex min-h-12 items-center gap-2 rounded-2xl border border-[#e1e9e3] bg-white/80 px-3.5 shadow-sm transition focus-within:border-[#92d4ad] focus-within:ring-4 focus-within:ring-[#c9eed7]/60 sm:min-w-48">
       <CalendarDays className="size-4 text-[#2d9b73]" />
       <input aria-label="اختيار الشهر" type="month" value={monthKey} onChange={(event) => onChange(event.target.value)} className="number-ltr w-full bg-transparent text-left text-sm font-extrabold text-[#385246] outline-none" />
     </label>

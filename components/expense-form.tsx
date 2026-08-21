@@ -55,7 +55,7 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="expense-form space-y-5">
       <div className="expense-amount-card surface-card overflow-hidden rounded-[28px]">
         <div className="border-b border-[#edf1ed] px-5 pb-4 pt-5 sm:px-6">
           <div className="flex items-center gap-2 text-xs font-extrabold tracking-[0.12em] text-[#9ba69f]"><Hash className="size-3.5 text-[#2d9b73]" /> المبلغ</div>

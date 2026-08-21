@@ -37,13 +37,13 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
           <h1 className="mt-2 text-[clamp(1.75rem,5vw,2.65rem)] font-black leading-[1.12] tracking-[-0.06em] text-[#19382c]">السجل الشهري</h1>
           <p className="mt-2 text-sm leading-6 text-[#7d8982]">كل شهر له قصته وأرقامه الخاصة.</p>
         </div>
-        <div className="flex items-center gap-2 rounded-2xl border border-dashed border-[#bfdcc8] bg-[#f7fbf8] p-2">
+        <div className="history-create-month flex items-center gap-2 rounded-2xl border border-dashed border-[#bfdcc8] bg-[#f7fbf8] p-2">
           <input type="month" value={newMonthKey} onChange={(event) => setNewMonthKey(event.target.value)} aria-label="اختيار شهر جديد" className="number-ltr min-h-10 rounded-xl border border-[#deebe1] bg-white px-3 text-xs font-bold text-[#557061] outline-none focus:border-[#96d3ab]" />
           <button type="button" disabled={!newMonthKey} onClick={handleCreateMonth} className="flex min-h-10 items-center gap-1.5 rounded-xl bg-[#19382c] px-3 text-xs font-black text-white transition hover:bg-[#285542]"><CalendarPlus className="size-3.5" /> تجهيز شهر</button>
         </div>
       </header>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+      <div className="history-month-tabs flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
         {monthKeys.map((key) => (
           <button key={key} type="button" onClick={() => onMonthChange(key)} className={`shrink-0 rounded-2xl border px-4 py-3 text-xs font-black transition ${activeMonthKey === key ? "border-[#a2dbb5] bg-[#e9f7ee] text-[#247955]" : "border-[#e4ebe6] bg-white text-[#8a978f] hover:border-[#c6decd]"}`}>
             {formatMonthLabel(key, true)}
@@ -65,7 +65,7 @@ export default function HistoryView({ months, activeMonthKey, monthKeys, onMonth
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="history-stat-grid grid grid-cols-2 gap-3 sm:grid-cols-4">
         <HistoryStat label="الراتب" value={month.salary} icon={WalletCards} />
         <HistoryStat label="الاستقطاعات" value={month.deductions} icon={Landmark} />
         <HistoryStat label="عدد المصروفات" value={month.expenses.length} icon={Clock3} suffix="مصروف" />

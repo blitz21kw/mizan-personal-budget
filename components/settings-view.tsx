@@ -101,7 +101,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
 
   return (
     <div className="settings-view space-y-6 pb-2">
-      <header>
+      <header className="settings-header">
         <p className="text-xs font-extrabold tracking-[0.18em] text-[#2d9b73]">تخصيص الميزانية</p>
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -193,7 +193,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
 
       {message && <div role="status" className={`flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold ${message.startsWith("تم") ? "bg-[#eaf8ef] text-[#2d805b]" : "bg-[#fff3e5] text-[#b77830]"}`}><Check className="size-4" /> {message}</div>}
 
-      <div className="surface-card flex flex-col gap-3 rounded-[24px] p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="settings-footer surface-card flex flex-col gap-3 rounded-[24px] p-4 sm:flex-row sm:items-center sm:justify-between">
         <div><p className="text-xs font-bold text-[#849189]">المتاح بعد كل التخصيصات</p><p className={`number-ltr mt-1 text-lg font-black ${totals.afterFixedAllocations >= 0 ? "text-[#23835e]" : "text-[#c75b55]"}`}>{formatMoney(totals.afterFixedAllocations)}</p></div>
         <button type="button" onClick={handleSave} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[#2d9b73] px-5 text-sm font-black text-white transition hover:bg-[#248662]"><Check className="size-4" /> حفظ الإعدادات</button>
       </div>
