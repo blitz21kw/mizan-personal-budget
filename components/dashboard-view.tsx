@@ -209,7 +209,7 @@ export default function DashboardView({
             كل المصروفات <ArrowLeft className="size-3.5" />
           </button>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="budget-list grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {month.categories.map((category) => (
             <CategoryCard
               key={category.id}
@@ -288,7 +288,7 @@ export default function DashboardView({
 
 function MonthSelect({ monthKey, onChange }: { monthKey: string; onChange: (key: string) => void }) {
   return (
-    <label className="month-control group relative flex min-h-12 items-center gap-2 rounded-2xl border border-[#e1e9e3] bg-white/80 px-3.5 shadow-sm transition focus-within:border-[#92d4ad] focus-within:ring-4 focus-within:ring-[#c9eed7]/60 sm:min-w-48">
+    <label data-label={formatMonthLabel(monthKey)} className="month-control group relative flex min-h-12 items-center gap-2 rounded-2xl border border-[#e1e9e3] bg-white/80 px-3.5 shadow-sm transition focus-within:border-[#92d4ad] focus-within:ring-4 focus-within:ring-[#c9eed7]/60 sm:min-w-48">
       <CalendarDays className="size-4 text-[#2d9b73]" />
       <input aria-label="اختيار الشهر" type="month" value={monthKey} onChange={(event) => onChange(event.target.value)} className="number-ltr w-full bg-transparent text-left text-sm font-extrabold text-[#385246] outline-none" />
     </label>
@@ -360,7 +360,7 @@ function CategoryCard({ category, spent, onBudgetChange, onSpentChange }: { cate
   const statusClass = isOver ? "bg-[#fff0ee] text-[#c65b57]" : isApproaching ? "bg-[#fff5e9] text-[#c17d2f]" : "bg-[#eef8f1] text-[#308361]";
 
   return (
-    <article className={`budget-category-card surface-card rounded-[25px] p-4 transition hover:-translate-y-0.5 ${isOver ? "border-[#f1c1bc] bg-[#fffafa]" : ""}`}>
+    <article data-status={isOver ? "over" : isApproaching ? "warning" : "ok"} className={`budget-category-card surface-card rounded-[25px] p-4 transition hover:-translate-y-0.5 ${isOver ? "border-[#f1c1bc] bg-[#fffafa]" : ""}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-[16px]" style={{ backgroundColor: `${category.color}1A`, color: category.color }}>

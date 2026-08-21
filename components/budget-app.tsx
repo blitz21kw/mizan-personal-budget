@@ -308,7 +308,7 @@ export default function BudgetApp() {
   if (!hydrated || !activeMonth) return <LoadingShell />;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" data-ui-version="calm-mobile-v1">
       <div className="mx-auto flex min-h-screen max-w-[1500px] lg:flex-row">
         <DesktopSidebar activeView={activeView} onChange={changeView} />
         <main className="app-main-shell min-w-0 flex-1 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
