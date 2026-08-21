@@ -28,6 +28,7 @@ type DashboardViewProps = {
   onUpdateCategoryBudget: (categoryId: string, budget: number) => void;
   onUpdateCategorySpent: (categoryId: string, spent: number) => void;
   onUpdateReserve: (field: ReserveField, amount: number) => void;
+  onUpdateOutingsSpent: (amount: number) => void;
   onTransferSurplus: (investmentPercent: number, emergencyPercent: number) => void;
   onAddExpense: () => void;
   onOpenSettings: () => void;
@@ -42,6 +43,7 @@ export default function DashboardView({
   onUpdateCategoryBudget,
   onUpdateCategorySpent,
   onUpdateReserve,
+  onUpdateOutingsSpent,
   onTransferSurplus,
   onAddExpense,
   onOpenSettings,
@@ -228,7 +230,7 @@ export default function DashboardView({
       <section className="grid gap-3 sm:grid-cols-3">
         <ReserveCard label="استثمار" value={month.investment} helper="تخصيص شهري" icon={TrendingUp} tone="mint" onChange={(amount) => onUpdateReserve("investment", amount)} />
         <ReserveCard label="صندوق الطوارئ" value={month.emergencyFund} helper="أمان أكثر" icon={ShieldCheck} tone="peach" onChange={(amount) => onUpdateReserve("emergencyFund", amount)} />
-        <ReserveCard label="طلعات ومطاعم" value={month.outings} helper="مساحة للمتعة" icon={CircleDollarSign} tone="lavender" onChange={(amount) => onUpdateReserve("outings", amount)} />
+        <OutingsCard allocated={month.outings} spent={month.outingsSpent} onAllocatedChange={(amount) => onUpdateReserve("outings", amount)} onSpentChange={onUpdateOutingsSpent} />
       </section>
 
       <section className="surface-card rounded-[28px] p-5 sm:p-6">
@@ -408,6 +410,47 @@ function ReserveCard({ label, value, helper, icon: Icon, tone, onChange }: { lab
       </div>
       <span className="mr-auto whitespace-nowrap text-[10px] font-bold text-[#a3ada7]">{helper}</span>
     </div>
+  );
+}
+
+function OutingsCard({ allocated, spent, onAllocatedChange, onSpentChange }: { allocated: number; spent: number; onAllocatedChange: (amount: number) => void; onSpentChange: (amount: number) => void }) {
+  const remaining = allocated - spent;
+  const ratio = allocated > 0 ? spent / allocated : spent > 0 ? 1 : 0;
+  const isOver = remaining < 0;
+  const isApproaching = ratio >= 0.8 && !isOver;
+  const statusLabel = isOver ? "تجاوزت الحد" : isApproaching ? "اقتربت من الحد" : "ضمن الخطة";
+  const statusClass = isOver ? "bg-[#fff0ee] text-[#c65b57]" : isApproaching ? "bg-[#fff5e9] text-[#c17d2f]" : "bg-[#f3edfb] text-[#8e62b3]";
+
+  return (
+    <article className={`reserve-card surface-card rounded-[23px] p-4 ${isOver ? "border-[#f1c1bc] bg-[#fffafa]" : ""}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-[16px] bg-[#f2ebfb] text-[#9d6bc3]"><CircleDollarSign className="size-[19px]" /></span>
+          <div className="min-w-0">
+            <p className="truncate text-xs font-bold text-[#8a978f]">طلعات ومطاعم</p>
+            <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-[#98a39c]">
+              <span>المخصص</span>
+              <BudgetAmountInput value={allocated} label="مخصص طلعات ومطاعم" onCommit={onAllocatedChange} compact />
+              <span>د.ك</span>
+            </div>
+          </div>
+        </div>
+        <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-extrabold ${statusClass}`}>{statusLabel}</span>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-2 text-[11px]">
+        <span className="flex items-center gap-1 font-bold text-[#78857d]">المصروف <InlineMoneyInput value={spent} label="المصروف في طلعات ومطاعم" onCommit={onSpentChange} compact /> <span className="text-[9px] text-[#9aa59e]">د.ك</span></span>
+        <span className={`number-ltr whitespace-nowrap font-black ${isOver ? "text-[#d55d59]" : "text-[#7e56a4]"}`}>{isOver ? `−${formatMoney(Math.abs(remaining))}` : formatMoney(remaining)} <span className="font-bold text-[#8c9991]">متبقي</span></span>
+      </div>
+
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f0edf3]">
+        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, Math.max(0, ratio * 100))}%`, backgroundColor: isOver ? "#db645d" : isApproaching ? "#ed9a4d" : "#9d6bc3" }} />
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[9px] font-bold text-[#a0aaa4]">
+        <span>{Math.round(ratio * 100)}% مستخدم</span>
+        <span>{isOver ? "تجاوزت المخصص" : "من ميزانية الطلعات"}</span>
+      </div>
+    </article>
   );
 }
 

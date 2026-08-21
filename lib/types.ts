@@ -36,6 +36,7 @@ export type MonthData = {
   investment: number;
   emergencyFund: number;
   outings: number;
+  outingsSpent: number;
   reserveAllocationMode: ReserveAllocationMode;
   surplusTransferred: number;
 };

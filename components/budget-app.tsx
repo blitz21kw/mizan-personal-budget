@@ -218,6 +218,20 @@ export default function BudgetApp() {
     });
   }, []);
 
+  const updateOutingsSpent = useCallback((amount: number) => {
+    setState((previous) => {
+      const month = previous.months[previous.activeMonthKey];
+      if (!month) return previous;
+      return {
+        ...previous,
+        months: {
+          ...previous.months,
+          [previous.activeMonthKey]: { ...month, outingsSpent: amount },
+        },
+      };
+    });
+  }, []);
+
   const updateMonthValue = useCallback((field: "salary" | "deductions" | "totalSpent" | "savingsThisMonth", amount: number) => {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
@@ -300,7 +314,7 @@ export default function BudgetApp() {
         <main className="app-main-shell min-w-0 flex-1 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
           <div className="app-content mx-auto max-w-[1180px]">
             <TopBar activeView={activeView} onChange={changeView} />
-            {activeView === "dashboard" && <DashboardView month={activeMonth} onMonthChange={selectMonth} onUpdateMonthValue={updateMonthValue} onUpdateCategoryBudget={updateCategoryBudget} onUpdateCategorySpent={updateCategorySpent} onUpdateReserve={updateReserve} onTransferSurplus={transferSurplus} onAddExpense={() => changeView("add")} onOpenSettings={() => changeView("settings")} onOpenTransactions={() => changeView("transactions")} onOpenHistory={() => changeView("history")} />}
+            {activeView === "dashboard" && <DashboardView month={activeMonth} onMonthChange={selectMonth} onUpdateMonthValue={updateMonthValue} onUpdateCategoryBudget={updateCategoryBudget} onUpdateCategorySpent={updateCategorySpent} onUpdateReserve={updateReserve} onUpdateOutingsSpent={updateOutingsSpent} onTransferSurplus={transferSurplus} onAddExpense={() => changeView("add")} onOpenSettings={() => changeView("settings")} onOpenTransactions={() => changeView("transactions")} onOpenHistory={() => changeView("history")} />}
             {activeView === "add" && <AddExpenseView month={activeMonth} onSave={addExpense} onCancel={() => changeView("dashboard")} />}
             {activeView === "settings" && <SettingsView month={activeMonth} onSave={saveSettings} />}
             {activeView === "history" && <HistoryView months={state.months} activeMonthKey={state.activeMonthKey} monthKeys={monthKeys} onMonthChange={selectMonth} onCreateMonth={createNewMonth} />}

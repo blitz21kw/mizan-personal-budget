@@ -24,6 +24,7 @@ export function createMonth(monthKey = getMonthKey(new Date()), template?: Month
     investment: 0,
     emergencyFund: 0,
     outings: 0,
+    outingsSpent: 0,
     reserveAllocationMode: "auto",
     surplusTransferred: 0,
   };
@@ -102,6 +103,7 @@ function normalizeMonth(monthKey: string, value: unknown, fallback?: MonthData):
     investment,
     emergencyFund,
     outings,
+    outingsSpent: Math.max(0, numberOr(candidate.outingsSpent, 0)),
     reserveAllocationMode,
     surplusTransferred: Math.max(0, numberOr(candidate.surplusTransferred, fallback?.surplusTransferred ?? 0)),
   };
