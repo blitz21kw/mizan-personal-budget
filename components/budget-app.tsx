@@ -9,6 +9,7 @@ import { DesktopSidebar, MobileBottomNav } from "@/components/navigation";
 import SettingsView from "@/components/settings-view";
 import TransactionsView from "@/components/transactions-view";
 import { createInitialState, createMonth, loadState, saveState } from "@/lib/storage";
+import { MAX_OUTINGS_ALLOCATION } from "@/lib/constants";
 import { formatMoney, getAutomaticReserveAllocation, getMonthKey, getUnusedBudgetSurplus } from "@/lib/format";
 import type { AppView, BudgetState, Expense, ExpenseDraft, MonthData, MonthSettings } from "@/lib/types";
 
@@ -203,15 +204,14 @@ export default function BudgetApp() {
     setState((previous) => {
       const month = previous.months[previous.activeMonthKey];
       if (!month) return previous;
-      const nextMonth = { ...month, [field]: amount };
+      const nextMonth = { ...month, [field]: field === "outings" ? Math.min(MAX_OUTINGS_ALLOCATION, amount) : amount };
       return {
         ...previous,
         months: {
           ...previous.months,
           [previous.activeMonthKey]: {
             ...nextMonth,
-            ...getAutomaticReserveAllocation(nextMonth),
-            reserveAllocationMode: "auto",
+            reserveAllocationMode: "manual",
           },
         },
       };

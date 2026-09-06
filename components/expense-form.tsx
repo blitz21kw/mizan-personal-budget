@@ -86,7 +86,7 @@ export default function ExpenseForm({ categories, onSave, onCancel, initialExpen
             <label className="flex items-center gap-2 text-xs font-extrabold tracking-[0.12em] text-[#9ba69f]"><Tag className="size-3.5 text-[#2d9b73]" /> التصنيف</label>
             {selectedCategory && <span className="flex items-center gap-1.5 text-[11px] font-bold text-[#63786c]"><span className="size-2 rounded-full" style={{ backgroundColor: selectedCategory.color }} /> {selectedCategory.name}</span>}
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <div className="expense-category-grid mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {categories.map((category) => {
               const selected = category.id === categoryId;
               return (

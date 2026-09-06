@@ -13,6 +13,7 @@ export function formatMoney(value: number, currency = "د.ك") {
 
 export function normalizeNumericInput(value: string) {
   return value
+    .replace(/[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069\s]/g, "")
     .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 0x0660))
     .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 0x06f0))
     .replace(/٫/g, ".")

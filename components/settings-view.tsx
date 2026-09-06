@@ -1,5 +1,6 @@
 import { Check, ChevronLeft, CirclePlus, Coins, PenLine, Plus, ShieldCheck, Trash2, TrendingUp, WalletCards } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import MoneyEditor from "@/components/money-editor";
 import { CATEGORY_COLORS, MAX_OUTINGS_ALLOCATION } from "@/lib/constants";
 import { formatMoney, getAutomaticReserveAllocation, getMonthTotals, normalizeNumericInput } from "@/lib/format";
 import type { Category, MonthData, MonthSettings, ReserveAllocationMode } from "@/lib/types";
@@ -165,8 +166,7 @@ export default function SettingsView({ month, onSave }: SettingsViewProps) {
               <span className="flex size-9 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${category.color}1A` }}><span className="size-2.5 rounded-full" style={{ backgroundColor: category.color }} /></span>
               <span className="min-w-0 flex-1 truncate text-sm font-black text-[#3a5143]">{category.name}</span>
               <div className="relative w-28 shrink-0 sm:w-36">
-                <input aria-label={`ميزانية ${category.name}`} value={category.budget} onChange={(event) => updateCategory(category.id, normalizeNumericInput(event.target.value))} type="text" inputMode="decimal" className="number-ltr min-h-11 w-full rounded-xl border border-[#e5ece7] bg-[#fbfcfb] px-3 pl-10 text-left text-sm font-black text-[#334c3d] outline-none transition focus:border-[#96d3ab] focus:bg-white focus:ring-4 focus:ring-[#d8f2e0]" />
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#9aa59e]">د.ك</span>
+                <MoneyEditor label={`ميزانية ${category.name}`} value={category.budget} onCommit={(value) => updateCategory(category.id, String(value))} />
               </div>
               {!category.isDefault && <button type="button" onClick={() => removeCategory(category)} className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[#c87972] transition hover:bg-[#fff0ee]" aria-label={`حذف ${category.name}`}><Trash2 className="size-4" /></button>}
               {category.isDefault && <span className="flex size-10 shrink-0 items-center justify-center text-[#c4cec7]"><PenLine className="size-3.5" /></span>}

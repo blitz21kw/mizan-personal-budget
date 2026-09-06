@@ -15,7 +15,8 @@ import {
   WalletCards,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import MoneyEditor from "@/components/money-editor";
 import { formatMoney, formatMonthLabel, getMonthTotals, getUnusedBudgetSurplus, normalizeNumericInput } from "@/lib/format";
 import type { Category, MonthData } from "@/lib/types";
 
@@ -454,64 +455,8 @@ function OutingsCard({ allocated, spent, onAllocatedChange, onSpentChange }: { a
   );
 }
 
-function BudgetAmountInput({ value, label, onCommit, compact = false }: { value: number; label: string; onCommit: (value: number) => void; compact?: boolean }) {
-  const [draft, setDraft] = useState(String(value));
-
-  useEffect(() => {
-    setDraft(String(value));
-  }, [value]);
-
-  function commit() {
-    const normalized = normalizeNumericInput(draft);
-    const parsed = Math.max(0, Number.parseFloat(normalized) || 0);
-    setDraft(String(parsed));
-    if (parsed !== value) onCommit(parsed);
-  }
-
-  return (
-    <input
-      aria-label={label}
-      type="text"
-      inputMode="decimal"
-      value={draft}
-      onChange={(event) => setDraft(normalizeNumericInput(event.target.value))}
-      onBlur={commit}
-      onKeyDown={(event) => {
-        if (event.key === "Enter") {
-          event.currentTarget.blur();
-        }
-      }}
-      className={`money-edit-input number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[4.5rem] text-sm" : "w-[4.75rem] text-[11px]"}`}
-    />
-  );
-}
-
-function InlineMoneyInput({ value, label, onCommit, compact = false }: { value: number; label: string; onCommit: (value: number) => void; compact?: boolean }) {
-  const [draft, setDraft] = useState(String(value));
-
-  useEffect(() => {
-    setDraft(String(value));
-  }, [value]);
-
-  function commit() {
-    const parsed = Math.max(0, Number.parseFloat(normalizeNumericInput(draft)) || 0);
-    setDraft(String(parsed));
-    if (parsed !== value) onCommit(parsed);
-  }
-
-  return (
-    <input
-      aria-label={label}
-      type="text"
-      inputMode="decimal"
-      value={draft}
-      onChange={(event) => setDraft(normalizeNumericInput(event.target.value))}
-      onBlur={commit}
-      onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}
-      className={`money-edit-input number-ltr rounded-lg border border-transparent bg-[#f5f8f5] px-1.5 text-left font-black text-[#2d6f50] outline-none transition focus:border-[#9bd9b1] focus:bg-white focus:ring-2 focus:ring-[#d8f2e0] ${compact ? "w-[3.8rem] text-[11px]" : "w-[4.75rem] text-sm"}`}
-    />
-  );
-}
+const BudgetAmountInput = MoneyEditor;
+const InlineMoneyInput = MoneyEditor;
 
 function percentageValue(value: string) {
   return Math.min(100, Math.max(0, Number.parseFloat(normalizeNumericInput(value)) || 0));
